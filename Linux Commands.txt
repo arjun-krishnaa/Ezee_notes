@@ -1,0 +1,85 @@
+05-01-2025
+
+ubuntu - username - ubuntu
+ec2-user - username - amazon Linux
+
+cd - change directory
+mkdir - make directory
+pwd - present working directory
+
+cp - copy
+scp - copy from server to server
+mv - to move or rename a file
+
+rm -remove a file
+
+sudo su -switch user
+sudo -i 
+
+free -h - to know the memory
+top - to know cpu utilization
+
+vi - to create or edit a file
+:wq!- save and quit
+:q! - quit without save
+:%d - Delete 
+
+chmod - give access to file or disk
+chown - change ownership for a file or a directory
+
+kill - to kill the process
+
+find - to find file
+
+grep - search a file
+
+ls
+ls -lrt - to show files
+ls -lrta - to show hidden files
+
+yum - package installer for amazon Linux
+apt - package installer for ubuntu
+
+./ - to run shell script
+
+touch - to create an empty file
+
+id - to user name and id
+
+crontab -e - to automate a script in fixed time
+
+df -h - disk free usage
+
+awk - to find or extract the particular word
+
+cat - to display the file content
+
+echo - to print
+
+printev - to view environmental variables
+
+wget - webget to download a file
+
+curl - to access a website
+
+unzip - to unzip the zipped file
+
+tar -xvzf - to untar the tar file
+
+history - to see history of commands
+
+uptime - to view machine running time
+
+
+
+
+
+
+
+
+
+
+
+
+
+
