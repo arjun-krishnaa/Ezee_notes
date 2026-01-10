@@ -1,0 +1,24 @@
+sudo useradd test_user --->  to Add a User in Linux
+
+sudo useradd -d /home/test_user test_user ---> to Add User by Specifying a home directory path for the new user
+
+sudo useradd -u 1234 test_user  ---> to Create a User with a Specific User ID (UID)
+
+sudo useradd -g 1000 test_user  ---> to Create a User with a Specific Group ID (GID)
+
+sudo useradd -M test_user  --->  to Create a User Without a Home Directory
+
+sudo useradd -e 2020-05-30 test_user  --->  to Create User with an Expiry Date
+
+sudo useradd -c "This is a test user" test_user  --->  to Create User with a Comment
+
+sudo useradd -s /bin/sh test_user  --->  to Create a User with Changed Login Shell
+
+sudo useradd -p test_password test_user  ---> to Set an Unencrypted Password for the User
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
+sudo usermod --shell /bin/bash nishant ---> using this command we can change the bin/bash command
+
+

@@ -1,0 +1,543 @@
+i have to create three user for local wsl ubuntu machine. give me step by step process and also show how to login for three users and give me a walk through
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Below is a **clear, beginner-friendly, step-by-step walkthrough** to create **three users on a local WSL Ubuntu machine**, switch/login between them, and understand what’s happening at each step.
+
+I’ll assume:
+
+* You are using **WSL with Ubuntu** (e.g., Ubuntu 20.04 / 22.04)
+* You already have **one existing user** (the default WSL user)
+* You are working inside the **Ubuntu terminal**
+
+---
+
+## PART 1: Open Your WSL Ubuntu
+
+1. Open **Windows Terminal**
+2. Select **Ubuntu** (or run `wsl`)
+
+You should see something like:
+
+```bash
+username@DESKTOP:~$
+```
+
+---
+
+## PART 2: Become Root (Admin Access)
+
+Creating users requires admin privileges.
+
+Run:
+
+```bash
+sudo -i
+```
+
+Enter your password.
+
+You should now see:
+
+```bash
+root@DESKTOP:~#
+```
+
+---
+
+## PART 3: Create Three Users
+
+We’ll create:
+
+* `user1`
+* `user2`
+* `user3`
+
+### Step 1: Create user1
+
+```bash
+adduser user1
+```
+
+You will be prompted to:
+
+* Set a password
+* Confirm password
+* (Optional) Fill in details → press **Enter** to skip
+
+### Step 2: Create user2
+
+```bash
+adduser user2
+```
+
+### Step 3: Create user3
+
+```bash
+adduser user3
+```
+
+At this point, all three users are created.
+
+---
+
+## PART 4: (Optional but Recommended) Give Sudo Access
+
+If you want these users to run admin commands:
+
+```bash
+usermod -aG sudo user1
+usermod -aG sudo user2
+usermod -aG sudo user3
+```
+
+Verify:
+
+```bash
+groups user1
+```
+
+You should see `sudo` listed.
+
+---
+
+## PART 5: Switch / Login Between Users (Inside WSL)
+
+### Login as user1
+
+```bash
+su - user1
+```
+
+Prompt changes to:
+
+```bash
+user1@DESKTOP:~$
+```
+
+### Login as user2
+
+First exit user1:
+
+```bash
+exit
+```
+
+Then:
+
+```bash
+su - user2
+```
+
+### Login as user3
+
+```bash
+exit
+su - user3
+```
+
+Each `su - username` simulates a **full login session** for that user.
+
+---
+
+## PART 6: Verify Each User’s Home Directory
+
+While logged in as each user, run:
+
+```bash
+pwd
+```
+
+Output will be:
+
+```bash
+/home/user1
+/home/user2
+/home/user3
+```
+
+This confirms each user has:
+
+* Their own home directory
+* Separate environment
+
+---
+
+## PART 7: Login as a Specific User When Starting WSL
+
+### From Windows Command Prompt or PowerShell
+
+```powershell
+wsl -u user1
+```
+
+Or:
+
+```powershell
+wsl -u user2
+wsl -u user3
+```
+
+This directly opens WSL **logged in as that user**.
+
+---
+
+## PART 8: Set Default WSL User (Optional)
+
+To make one user the default when WSL starts:
+
+```powershell
+ubuntu config --default-user user1
+```
+
+(Use `ubuntu2204` or `ubuntu2004` depending on your version)
+
+---
+
+## PART 9: Quick User Management Commands (Cheat Sheet)
+
+### List all users
+
+```bash
+cut -d: -f1 /etc/passwd
+```
+
+### Check current user
+
+```bash
+whoami
+```
+
+### Delete a user (if needed)
+
+```bash
+deluser user3
+```
+
+### Delete user + home directory
+
+```bash
+deluser --remove-home user3
+```
+
+---
+
+## FINAL WALKTHROUGH SUMMARY
+
+1. Open Ubuntu in WSL
+2. Switch to root → `sudo -i`
+3. Create users → `adduser userX`
+4. (Optional) Grant sudo → `usermod -aG sudo userX`
+5. Switch users → `su - userX`
+6. Login directly → `wsl -u userX`
+7. Set default user if needed
+
+---
+
+If you want, I can also:
+
+* Show **file permissions between users**
+* Explain **how WSL users map to Windows files**
+* Create **isolated dev environments per user**
+* Draw a **visual diagram of user switching**
+
+Just tell me 👍
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+i have to create three user in aws ec2 machine. give me step by step process and also show how to login for three users and give me a walk through
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Below is a **complete, step-by-step walkthrough** for creating **three users on an AWS EC2 Linux machine**, logging in as them, and understanding how access works.
+
+I’ll assume:
+
+* You are using **Amazon Linux 2 / Amazon Linux 2023 / Ubuntu EC2**
+* You already have access via **SSH key** to the instance
+* You connect from your local machine using SSH
+
+I’ll clearly call out **Amazon Linux vs Ubuntu** differences where needed.
+
+---
+
+# OVERVIEW (What You’ll Do)
+
+1. SSH into EC2 as the default user
+2. Create three Linux users
+3. Set passwords (or SSH keys)
+4. Grant sudo access (optional)
+5. Login as each user (two methods)
+6. Verify and test access
+
+---
+
+# PART 1: SSH INTO YOUR EC2 INSTANCE
+
+From your **local machine**:
+
+### Amazon Linux
+
+```bash
+ssh -i mykey.pem ec2-user@<EC2_PUBLIC_IP>
+```
+
+### Ubuntu
+
+```bash
+ssh -i mykey.pem ubuntu@<EC2_PUBLIC_IP>
+```
+
+After login, you’ll see:
+
+```bash
+ec2-user@ip-172-31-xx-xx:~$
+```
+
+or
+
+```bash
+ubuntu@ip-172-31-xx-xx:~$
+```
+
+---
+
+# PART 2: SWITCH TO ROOT (ADMIN)
+
+```bash
+sudo -i
+```
+
+Prompt becomes:
+
+```bash
+root@ip-172-31-xx-xx:~#
+```
+
+---
+
+# PART 3: CREATE THREE USERS
+
+We’ll create:
+
+* `dev1`
+* `dev2`
+* `dev3`
+
+### Step 1: Create users
+
+```bash
+useradd dev1
+useradd dev2
+useradd dev3
+```
+
+### Step 2: Create home directories
+
+(Some distros don’t auto-create home folders)
+
+```bash
+mkdir /home/dev1 /home/dev2 /home/dev3
+chown dev1:dev1 /home/dev1
+chown dev2:dev2 /home/dev2
+chown dev3:dev3 /home/dev3
+```
+
+---
+
+# PART 4: SET PASSWORDS (For su / password login)
+
+```bash
+passwd dev1
+passwd dev2
+passwd dev3
+```
+
+> 🔐 EC2 usually **disables password SSH login** by default — this is normal and secure.
+
+---
+
+# PART 5: (OPTIONAL) GRANT SUDO ACCESS
+
+### Amazon Linux / Ubuntu
+
+```bash
+usermod -aG wheel dev1   # Amazon Linux
+usermod -aG sudo dev2    # Ubuntu
+usermod -aG sudo dev3
+```
+
+To check:
+
+```bash
+groups dev1
+```
+
+---
+
+# PART 6: LOGIN AS EACH USER (METHOD 1 – `su`)
+
+This is the **most common** way inside EC2.
+
+### Login as dev1
+
+```bash
+su - dev1
+```
+
+### Verify
+
+```bash
+whoami
+pwd
+```
+
+Output:
+
+```bash
+dev1
+/home/dev1
+```
+
+### Switch to dev2
+
+```bash
+exit
+su - dev2
+```
+
+### Switch to dev3
+
+```bash
+exit
+su - dev3
+```
+
+---
+
+# PART 7: LOGIN AS EACH USER (METHOD 2 – SSH KEY BASED)
+
+This is **best practice** for EC2.
+
+---
+
+## Step 1: Create `.ssh` directories
+
+```bash
+mkdir -p /home/dev1/.ssh
+mkdir -p /home/dev2/.ssh
+mkdir -p /home/dev3/.ssh
+```
+
+### Set permissions
+
+```bash
+chmod 700 /home/dev1/.ssh
+chmod 700 /home/dev2/.ssh
+chmod 700 /home/dev3/.ssh
+```
+
+---
+
+## Step 2: Add public SSH keys
+
+Paste each user’s **public key** into:
+
+```bash
+nano /home/dev1/.ssh/authorized_keys
+nano /home/dev2/.ssh/authorized_keys
+nano /home/dev3/.ssh/authorized_keys
+```
+
+### Permissions
+
+```bash
+chmod 600 /home/dev1/.ssh/authorized_keys
+chmod 600 /home/dev2/.ssh/authorized_keys
+chmod 600 /home/dev3/.ssh/authorized_keys
+```
+
+### Ownership
+
+```bash
+chown -R dev1:dev1 /home/dev1/.ssh
+chown -R dev2:dev2 /home/dev2/.ssh
+chown -R dev3:dev3 /home/dev3/.ssh
+```
+
+---
+
+# PART 8: LOGIN DIRECTLY AS USERS VIA SSH
+
+From your **local machine**:
+
+```bash
+ssh -i dev1.pem dev1@<EC2_PUBLIC_IP>
+ssh -i dev2.pem dev2@<EC2_PUBLIC_IP>
+ssh -i dev3.pem dev3@<EC2_PUBLIC_IP>
+```
+
+Each user now has:
+
+* Their own home directory
+* Their own SSH key
+* Optional sudo access
+
+---
+
+# PART 9: VERIFY USERS
+
+### List users
+
+```bash
+cut -d: -f1 /etc/passwd
+```
+
+### Check logged-in users
+
+```bash
+who
+```
+
+### Test sudo
+
+```bash
+sudo yum update    # Amazon Linux
+sudo apt update    # Ubuntu
+```
+
+---
+
+# PART 10: COMMON TROUBLESHOOTING
+
+### ❌ Permission denied (publickey)
+
+* Check key permissions
+* Check ownership
+* Ensure correct username
+
+### ❌ Cannot sudo
+
+* Verify user is in `wheel` or `sudo` group
+
+---
+
+# FINAL WALKTHROUGH SUMMARY
+
+1. SSH to EC2 as default user
+2. Switch to root
+3. Create users
+4. Set passwords
+5. (Optional) Grant sudo
+6. Login using `su`
+7. Login directly using SSH keys
+
+---
+
+If you want, I can also:
+
+* Create **IAM-based EC2 access**
+* Show **how to restrict users to specific folders**
+* Configure **SFTP-only users**
+* Add **CloudTrail + SSH audit logs**
+
+Just tell me what you need next 🚀
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

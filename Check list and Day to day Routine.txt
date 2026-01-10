@@ -1,0 +1,13 @@
+1. Site Watch
+
+2. Vertex - Ticket and Asset (Domain) Handling
+
+3. Database Management
+
+4. Domain [renewing and statusing]
+
+5. Asset Managing [Laptop]
+
+6. Server Monitoring [ELK - dashbord]
+
+7. 
