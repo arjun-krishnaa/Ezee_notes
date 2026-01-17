@@ -1,0 +1,13 @@
+1. sudo apt update  ---> update system
+
+2. sudo apt install nginx  ---> install ngnix
+
+3. apt install ufw  ---> install firewall
+
+4. ufw allow 'Nginx HTTP' ---> allow ngnix to listen 80 port
+
+5. systemctl status nginx  ---> to see the status of ngnix
+
+6. /var/www/html/  ---> deployment path for index.html
+
+7. cat /var/log/nginx/access.log  ---> to see access log

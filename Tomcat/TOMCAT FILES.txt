@@ -1,0 +1,22 @@
+[root@FleetAppService tomcat-11.0.10]# ls conf/
+Catalina                catalina.properties  email.properties          jaspic-providers.xsd  sms.properties    web.xml
+application.properties  config.properties    gatewayconfig.properties  logging.properties    tomcat-users.xml  whatsapp.properties
+cache.properties        context.xml          jaspic-providers.xml      server.xml            tomcat-users.xsd
+
+1. application.properties
+
+2. server.xml
+
+3. context.xml
+
+
+Summary Table
+File				Scope		Primary Purpose
+server.xml		Server		Ports, Connectors (HTTP/AJP), Virtual Hosts.
+web.xml			Global/App	Servlet mappings, Session timeout, MIME types.
+context.xml		Global/App	JNDI Resources (Database connections), Loader settings.
+tomcat-users.xml	Server		Users and Roles for the Manager App.
+catalina.properties	Server		Classpath tuning, JAR scanning filters.
+
+
+---------------------------------------------------------------------------------------------------------
