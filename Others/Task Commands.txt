@@ -1,0 +1,76 @@
+TASK 1: User Creation & Access Control (Real Production Scenario) 
+
+1  ls
+    2  cd .
+    3  cd ..
+    4  ls
+    5  cd etc/
+    6  ls
+    7  cat group
+    8  ssh devuser@13.127.168.222
+    9  groupadd developers
+   10  getent group developers
+   11  useradd -m -g developers devuser
+   12  id devuser
+   13  passwd devuser
+   14  chage -d 0 devuser
+   15  chage -l devuser
+   16  chage -E $(date -d "+30 days" +%Y-%m-%d) devuser
+   17  chage -l devuser
+   18  groups devuser
+   19  gpasswd -d devuser wheel
+   20  sudo -l -U devuser
+   21  vi /etc/ssh/sshd_config
+   22  systemctl restart sshd
+   23  cd /etc/ssh/
+   24  ls
+   25  systemctl restart sshd
+   26  ls -lrta
+   27  systemctl restart ssh
+   28  systemctl status ssh
+   29  cat /etc/os-release
+   30  cd ..
+   31  cd home/
+   32  ls
+   33  cd devuser/
+   34  ls
+   35  mkdir .ssh
+   36  cd .ssh/
+   37  cd ..
+   38  cp /home/ubuntu/.ssh/authorized_keys /home/devuser/.ssh/
+   39  ls
+   40  chmod 700 /home/devuser/.ssh
+   41  cp /home/ubuntu/.ssh/authorized_keys /home/devuser/.ssh/
+   42  ls
+   43  cd .ssh/
+   44  ls
+   45  cat authorized_keys
+   46  chown -R devuser:developers /home/devuser/.ssh
+   47  chmod 600 /home/devuser/.ssh/authorized_keys
+   48  cd ..
+   49  cd etc/
+   50  ls
+   51  cat passwd | grep devuser
+   52  usermode -s /bin/bash devuser
+   53  usermod -s /bin/bash devuser
+=========================================================================================================================
+TASK 2: Linux Basic Commands (Daily Admin Work)
+
+55  df -h
+   56  free
+   57  free -h
+   58  du -h --max-depth=1 /
+   59  find /var -type f -exec du -h {} + | sort -hr | head -5
+   60  find /var/log -type f -mtime +7
+   61  cat /var/log/apt/history.log
+   62  find /var/log -type f -mtime +7 -ls
+   63  find / -user devuser 2>/dev/null
+   64  ls -ld /opt/app
+   65  chown -R devuser:developers /opt/app
+   66  cd ..
+   67  ls -ld /opt/app
+   68  lastlog
+   69  find / -size +500M 2>/dev/null
+   70  df -h
+   71  history
+=============================================================================================================================

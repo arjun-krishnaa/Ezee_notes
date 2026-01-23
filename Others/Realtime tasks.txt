@@ -1,0 +1,217 @@
+Great—since you’ve already **done user creation on AWS, local access, and shell scripting**, here are **real-time, hands-on tasks** that mirror what Linux/System Admins actually do in production. These are **task-based scenarios**, not theory.
+
+---
+
+## 🔹 TASK 1: User Creation & Access Control (Real Production Scenario)
+
+### Scenario
+
+A new developer joins your team and needs limited access to the server.
+
+### Tasks
+
+1. Create a user `devuser`
+2. Set password and force password change on first login
+3. Add user to a group `developers`
+4. Allow SSH access but **no sudo access**
+5. Set account to expire after 30 days
+6. Verify login and permissions
+
+### Commands You’ll Use
+
+* `useradd`, `passwd`, `chage`
+* `groupadd`, `usermod`
+* `id`, `su`
+
+✅ **Expected Outcome:**
+User can log in via SSH but cannot install packages or access `/root`.
+
+---
+
+## 🔹 TASK 2: Linux Basic Commands (Daily Admin Work)
+
+### Scenario
+
+You are troubleshooting disk space and file ownership issues.
+
+### Tasks
+
+1. Find top 5 largest files in `/var`
+2. Check disk usage in human-readable format
+3. Find files owned by `devuser`
+4. Change ownership of `/opt/app` to `developers`
+5. Check last login of all users
+
+### Commands Used
+
+* `df -h`, `du -sh`
+* `find`
+* `ls -lh`
+* `lastlog`
+
+---
+
+## 🔹 TASK 3: Vi Editor – Emergency Production Fix
+
+### Scenario
+
+A service is down due to a wrong config entry.
+
+### Tasks
+
+1. Open `/etc/ssh/sshd_config`
+2. Search for `PasswordAuthentication`
+3. Change value from `no` to `yes`
+4. Enable line numbers
+5. Undo last change
+6. Save and exit
+
+### Vi Shortcuts Used
+
+```
+/searchword
+:set nu
+dd / u
+:wq
+```
+
+---
+
+## 🔹 TASK 4: awk – Log File Analysis (Real Monitoring Case)
+
+### Scenario
+
+You need to analyze server access logs.
+
+### Tasks
+
+1. Extract IP addresses from `/var/log/secure`
+2. Count failed login attempts per IP
+3. Print users who failed login more than 3 times
+
+### Example
+
+```bash
+awk '{print $11}' /var/log/secure | sort | uniq -c | sort -nr
+```
+
+---
+
+## 🔹 TASK 5: grep – Security Incident Investigation
+
+### Scenario
+
+Multiple failed SSH attempts detected.
+
+### Tasks
+
+1. Find all “Failed password” entries
+2. Search failed attempts for a specific IP
+3. Display line numbers of matches
+4. Exclude successful logins
+
+### Commands
+
+```bash
+grep "Failed password" /var/log/secure
+grep -n "Failed password" /var/log/secure
+grep -v "Accepted" /var/log/secure
+```
+
+---
+
+## 🔹 TASK 6: find – Cleanup & Maintenance Task
+
+### Scenario
+
+Server storage is almost full.
+
+### Tasks
+
+1. Find `.log` files older than 7 days
+2. Delete files larger than 100MB
+3. Find files not accessed in 30 days
+4. Archive them into `/backup`
+
+### Commands
+
+```bash
+find /var/log -type f -mtime +7
+find / -size +100M
+find /home -atime +30
+```
+
+---
+
+## 🔹 TASK 7: WinSCP – File Transfer (Real DevOps Flow)
+
+### Scenario
+
+Developers send build files to the server.
+
+### Tasks
+
+1. Connect EC2 Linux server using key-based auth
+2. Upload files to `/opt/app`
+3. Set correct permissions
+4. Download log files for debugging
+
+### Permissions
+
+```bash
+chmod 755 /opt/app
+chown devuser:developers /opt/app
+```
+
+---
+
+## 🔹 TASK 8: Combined Mini Project (INTERVIEW LEVEL ⭐)
+
+### Scenario
+
+Deploy and manage an application directory.
+
+### Tasks
+
+1. Create user `appuser`
+2. Create `/opt/app/logs`
+3. Write shell script to:
+
+   * Monitor disk usage
+   * Alert if usage > 80%
+4. Schedule script using cron
+5. Log output to `/var/log/app_monitor.log`
+6. Secure directory permissions
+
+---
+
+## 🔹 TASK 9: Shell Script (Production Ready)
+
+### Script Requirement
+
+* Check disk usage
+* Email alert (mock)
+* Log date, hostname, usage
+
+```bash
+#!/bin/bash
+THRESHOLD=80
+USAGE=$(df -h / | awk 'NR==2 {print $5}' | sed 's/%//')
+
+if [ $USAGE -gt $THRESHOLD ]; then
+  echo "$(date) Disk usage is high: $USAGE%" >> /var/log/disk_alert.log
+fi
+```
+
+---
+
+## 🔹 NEXT STEP (Optional)
+
+If you want, I can:
+
+* Convert these into **interview questions + answers**
+* Give **AWS Linux admin real-time scenarios**
+* Create **practice labs with expected output**
+* Prepare **L1/L2 Linux Admin tasks**
+
+Just tell me 👍

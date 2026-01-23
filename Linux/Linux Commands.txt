@@ -1,0 +1,185 @@
+05-01-2025
+
+ubuntu - username - ubuntu
+ec2-user - username - amazon Linux
+
+cd - change directory
+mkdir - make directory
+pwd - present working directory
+
+cp - copy
+scp - copy from server to server
+mv - to move or rename a file
+
+rm -remove a file
+
+sudo su -switch user
+sudo -i 
+
+free -h - to know the memory
+top - to know cpu utilization
+
+vi - to create or edit a file
+:wq!- save and quit
+:q! - quit without save
+:%d - Delete 
+
+chmod - give access to file or disk
+chown - change ownership for a file or a directory
+
+kill - to kill the process
+
+find - to find file
+
+grep - search a file
+
+ls
+ls -lrt - to show files
+ls -lrta - to show hidden files
+
+yum - package installer for amazon Linux
+apt - package installer for ubuntu
+
+./ - to run shell script
+
+touch - to create an empty file
+
+id - to user name and id
+
+crontab -e - to automate a script in fixed time
+
+df -h - disk free usage
+
+awk - to find or extract the particular word
+
+cat - to display the file content
+
+echo - to print
+
+printenv - to view environmental variables
+
+wget - webget to download a file
+
+curl - to access a website
+
+unzip - to unzip the zipped file
+
+tar -xvzf - to untar the tar file
+
+history - to see history of commands
+
+uptime - to view machine running time
+
+--------------------------------------------------------------------------------------
+07-01-25
+
+true -
+
+grep -i  - upper and lower case
+grep -n  - matched lines
+grep -c  - count
+grep -l  - matches with letter "l"
+grep -v  - except mention pattern or word
+
+ps
+ps -f - to view full details
+
+-----------------------------------------------------------------------------------
+08-01-25
+
+who | wc -l
+who - shows login users name
+w - count the number of words
+c - count number of bytes
+m - count number of characters
+l - count number of lines
+L - find the length of the longest line
+
+"echo"
+
+$  - mention the single name
+`  - in between the backqoutes are command
+\$ - 
+\'
+\"
+\\
+
+"true" - to delete the data in the file
+"aux"  - to grep the running process
+
+"ctrl+r" - helps to search the command in Linux
+
+
+ENHANCED COMMANDS
+-----------------
+ps aux | wc -l  --> shows the count of running process
+ps aux 		--> shows the running process ids and information
+
+ps aux | head -n 5 --> shows the top 5 running process id and information
+ps aux | tail -n 5 --> shows the bottom 5 running process id and information
+
+ps aux | head -n 5 | awk '{print $4}' --> shows the top 5 running process's 4 column only
+
+ps aux | head -n 5 | awk '$4 > 0.2'  --> shows the value more than 0.2 in the 4th column of top 5 process
+
+ps -eo pid,user,cmd --> shows the running process ids, users, cmts
+ps -eo pid,user,cmd |head -n 5 --> shows the running process ids, users, cmts in top 5
+
+ps -eo pid,user,cmd |tail -n 5 > demo.txt --> print the running process ids, users, cmts of bottom 5 in demo.txt file
+
+ps -eo pid,user,cmd,%mem --sort=-%mem | head -n 10 --> shows the running process ids, users, mem and cmts of top 10
+
+FIND COMMANDS
+
+find /home/notes/ -empty --> to find empty files
+
+find /home/notes/ -name "*.txt" --> to find all ".txt" commands
+find . -name "*.txt"
+
+find /home/notes/ -size +1k --> to find files with size more than 1kb.
+
+find /home/notes/ -maxdepth 2 -name "*.txt" --> find depends depth
+find . -maxdepth 2 -name "*.txt"
+
+find . -mtime -+3 ---> helps to find "days older file"
+
+************************
+cp -r /mnt/d/Arjun/Notes/ * /mnt/c/Users/admin/
+cp -r /mnt/c/Users/admin/notes/ /home/admin1/ ----> copy files from local to wsl
+******************************
+
+cat apache_logs.txt | grep -c "logstash"      
+cat apache_logs.txt | grep "logstash" | wc -l   --> both gives same result "2369"
+
+AWK COMMANDS
+
+awk '{print $7}' apache_logs.txt | head -n 10
+
+-----------------------------------------------------------------------------------------------------------------------------------
+09-01-25
+
+cat -n apache_logs.txt  --> shows the content in the file with number
+
+systemctl list-units --type=service --state=running ------->  to find Running Services
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

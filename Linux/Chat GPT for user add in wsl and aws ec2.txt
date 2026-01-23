@@ -1,0 +1,1260 @@
+i have to create three user for local wsl ubuntu machine. give me step by step process and also show how to login for three users and give me a walk through
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Below is a **clear, beginner-friendly, step-by-step walkthrough** to create **three users on a local WSL Ubuntu machine**, switch/login between them, and understand what’s happening at each step.
+
+I’ll assume:
+
+* You are using **WSL with Ubuntu** (e.g., Ubuntu 20.04 / 22.04)
+* You already have **one existing user** (the default WSL user)
+* You are working inside the **Ubuntu terminal**
+
+---
+
+## PART 1: Open Your WSL Ubuntu
+
+1. Open **Windows Terminal**
+2. Select **Ubuntu** (or run `wsl`)
+
+You should see something like:
+
+```bash
+username@DESKTOP:~$
+```
+
+---
+
+## PART 2: Become Root (Admin Access)
+
+Creating users requires admin privileges.
+
+Run:
+
+```bash
+sudo -i
+```
+
+Enter your password.
+
+You should now see:
+
+```bash
+root@DESKTOP:~#
+```
+
+---
+
+## PART 3: Create Three Users
+
+We’ll create:
+
+* `user1`
+* `user2`
+* `user3`
+
+### Step 1: Create user1
+
+```bash
+adduser user1
+```
+
+You will be prompted to:
+
+* Set a password
+* Confirm password
+* (Optional) Fill in details → press **Enter** to skip
+
+### Step 2: Create user2
+
+```bash
+adduser user2
+```
+
+### Step 3: Create user3
+
+```bash
+adduser user3
+```
+
+At this point, all three users are created.
+
+---
+
+## PART 4: (Optional but Recommended) Give Sudo Access
+
+If you want these users to run admin commands:
+
+```bash
+usermod -aG sudo user1
+usermod -aG sudo user2
+usermod -aG sudo user3
+```
+
+Verify:
+
+```bash
+groups user1
+```
+
+You should see `sudo` listed.
+
+---
+
+## PART 5: Switch / Login Between Users (Inside WSL)
+
+### Login as user1
+
+```bash
+su - user1
+```
+
+Prompt changes to:
+
+```bash
+user1@DESKTOP:~$
+```
+
+### Login as user2
+
+First exit user1:
+
+```bash
+exit
+```
+
+Then:
+
+```bash
+su - user2
+```
+
+### Login as user3
+
+```bash
+exit
+su - user3
+```
+
+Each `su - username` simulates a **full login session** for that user.
+
+---
+
+## PART 6: Verify Each User’s Home Directory
+
+While logged in as each user, run:
+
+```bash
+pwd
+```
+
+Output will be:
+
+```bash
+/home/user1
+/home/user2
+/home/user3
+```
+
+This confirms each user has:
+
+* Their own home directory
+* Separate environment
+
+---
+
+## PART 7: Login as a Specific User When Starting WSL
+
+### From Windows Command Prompt or PowerShell
+
+```powershell
+wsl -u user1
+```
+
+Or:
+
+```powershell
+wsl -u user2
+wsl -u user3
+```
+
+This directly opens WSL **logged in as that user**.
+
+---
+
+## PART 8: Set Default WSL User (Optional)
+
+To make one user the default when WSL starts:
+
+```powershell
+ubuntu config --default-user user1
+```
+
+(Use `ubuntu2204` or `ubuntu2004` depending on your version)
+
+---
+
+## PART 9: Quick User Management Commands (Cheat Sheet)
+
+### List all users
+
+```bash
+cut -d: -f1 /etc/passwd
+```
+
+### Check current user
+
+```bash
+whoami
+```
+
+### Delete a user (if needed)
+
+```bash
+deluser user3
+```
+
+### Delete user + home directory
+
+```bash
+deluser --remove-home user3
+```
+
+---
+
+## FINAL WALKTHROUGH SUMMARY
+
+1. Open Ubuntu in WSL
+2. Switch to root → `sudo -i`
+3. Create users → `adduser userX`
+4. (Optional) Grant sudo → `usermod -aG sudo userX`
+5. Switch users → `su - userX`
+6. Login directly → `wsl -u userX`
+7. Set default user if needed
+
+---
+
+If you want, I can also:
+
+* Show **file permissions between users**
+* Explain **how WSL users map to Windows files**
+* Create **isolated dev environments per user**
+* Draw a **visual diagram of user switching**
+
+Just tell me 👍
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+i have to create three user in aws ec2 machine. give me step by step process and also show how to login for three users and give me a walk through
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Below is a **complete, step-by-step walkthrough** for creating **three users on an AWS EC2 Linux machine**, logging in as them, and understanding how access works.
+
+I’ll assume:
+
+* You are using **Amazon Linux 2 / Amazon Linux 2023 / Ubuntu EC2**
+* You already have access via **SSH key** to the instance
+* You connect from your local machine using SSH
+
+I’ll clearly call out **Amazon Linux vs Ubuntu** differences where needed.
+
+---
+
+# OVERVIEW (What You’ll Do)
+
+1. SSH into EC2 as the default user
+2. Create three Linux users
+3. Set passwords (or SSH keys)
+4. Grant sudo access (optional)
+5. Login as each user (two methods)
+6. Verify and test access
+
+---
+
+# PART 1: SSH INTO YOUR EC2 INSTANCE
+
+From your **local machine**:
+
+### Amazon Linux
+
+```bash
+ssh -i mykey.pem ec2-user@<EC2_PUBLIC_IP>
+```
+
+### Ubuntu
+
+```bash
+ssh -i mykey.pem ubuntu@<EC2_PUBLIC_IP>
+```
+
+After login, you’ll see:
+
+```bash
+ec2-user@ip-172-31-xx-xx:~$
+```
+
+or
+
+```bash
+ubuntu@ip-172-31-xx-xx:~$
+```
+
+---
+
+# PART 2: SWITCH TO ROOT (ADMIN)
+
+```bash
+sudo -i
+```
+
+Prompt becomes:
+
+```bash
+root@ip-172-31-xx-xx:~#
+```
+
+---
+
+# PART 3: CREATE THREE USERS
+
+We’ll create:
+
+* `dev1`
+* `dev2`
+* `dev3`
+
+### Step 1: Create users
+
+```bash
+useradd dev1
+useradd dev2
+useradd dev3
+```
+
+### Step 2: Create home directories
+
+(Some distros don’t auto-create home folders)
+
+```bash
+mkdir /home/dev1 /home/dev2 /home/dev3
+chown dev1:dev1 /home/dev1
+chown dev2:dev2 /home/dev2
+chown dev3:dev3 /home/dev3
+```
+
+---
+
+# PART 4: SET PASSWORDS (For su / password login)
+
+```bash
+passwd dev1
+passwd dev2
+passwd dev3
+```
+
+> 🔐 EC2 usually **disables password SSH login** by default — this is normal and secure.
+
+---
+
+# PART 5: (OPTIONAL) GRANT SUDO ACCESS
+
+### Amazon Linux / Ubuntu
+
+```bash
+usermod -aG wheel dev1   # Amazon Linux
+usermod -aG sudo dev2    # Ubuntu
+usermod -aG sudo dev3
+```
+
+To check:
+
+```bash
+groups dev1
+```
+
+---
+
+# PART 6: LOGIN AS EACH USER (METHOD 1 – `su`)
+
+This is the **most common** way inside EC2.
+
+### Login as dev1
+
+```bash
+su - dev1
+```
+
+### Verify
+
+```bash
+whoami
+pwd
+```
+
+Output:
+
+```bash
+dev1
+/home/dev1
+```
+
+### Switch to dev2
+
+```bash
+exit
+su - dev2
+```
+
+### Switch to dev3
+
+```bash
+exit
+su - dev3
+```
+
+---
+
+# PART 7: LOGIN AS EACH USER (METHOD 2 – SSH KEY BASED)
+
+This is **best practice** for EC2.
+
+---
+
+## Step 1: Create `.ssh` directories
+
+```bash
+mkdir -p /home/dev1/.ssh
+mkdir -p /home/dev2/.ssh
+mkdir -p /home/dev3/.ssh
+```
+
+### Set permissions
+
+```bash
+chmod 700 /home/dev1/.ssh
+chmod 700 /home/dev2/.ssh
+chmod 700 /home/dev3/.ssh
+```
+
+---
+
+## Step 2: Add public SSH keys
+
+Paste each user’s **public key** into:
+
+```bash
+nano /home/dev1/.ssh/authorized_keys
+nano /home/dev2/.ssh/authorized_keys
+nano /home/dev3/.ssh/authorized_keys
+```
+
+### Permissions
+
+```bash
+chmod 600 /home/dev1/.ssh/authorized_keys
+chmod 600 /home/dev2/.ssh/authorized_keys
+chmod 600 /home/dev3/.ssh/authorized_keys
+```
+
+### Ownership
+
+```bash
+chown -R dev1:dev1 /home/dev1/.ssh
+chown -R dev2:dev2 /home/dev2/.ssh
+chown -R dev3:dev3 /home/dev3/.ssh
+```
+
+---
+
+# PART 8: LOGIN DIRECTLY AS USERS VIA SSH
+
+From your **local machine**:
+
+```bash
+ssh -i dev1.pem dev1@<EC2_PUBLIC_IP>
+ssh -i dev2.pem dev2@<EC2_PUBLIC_IP>
+ssh -i dev3.pem dev3@<EC2_PUBLIC_IP>
+```
+
+Each user now has:
+
+* Their own home directory
+* Their own SSH key
+* Optional sudo access
+
+---
+
+# PART 9: VERIFY USERS
+
+### List users
+
+```bash
+cut -d: -f1 /etc/passwd
+```
+
+### Check logged-in users
+
+```bash
+who
+```
+
+### Test sudo
+
+```bash
+sudo yum update    # Amazon Linux
+sudo apt update    # Ubuntu
+```
+
+---
+
+# PART 10: COMMON TROUBLESHOOTING
+
+### ❌ Permission denied (publickey)
+
+* Check key permissions
+* Check ownership
+* Ensure correct username
+
+### ❌ Cannot sudo
+
+* Verify user is in `wheel` or `sudo` group
+
+---
+
+# FINAL WALKTHROUGH SUMMARY
+
+1. SSH to EC2 as default user
+2. Switch to root
+3. Create users
+4. Set passwords
+5. (Optional) Grant sudo
+6. Login using `su`
+7. Login directly using SSH keys
+
+---
+
+If you want, I can also:
+
+* Create **IAM-based EC2 access**
+* Show **how to restrict users to specific folders**
+* Configure **SFTP-only users**
+* Add **CloudTrail + SSH audit logs**
+
+Just tell me what you need next 🚀
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+In Linux, permissions can mean **file/folder access** or **administrative (sudo) access**. Below are the **most common cases**, with clear commands.
+
+---
+
+## 1️⃣ Give a user permission to a file or directory
+
+### ➤ Change ownership (recommended)
+
+Give full control to a user:
+
+```bash
+sudo chown arjun:arjun filename
+```
+
+For a directory (recursive):
+
+```bash
+sudo chown -R arjun:arjun /path/to/directory
+```
+
+---
+
+### ➤ Change permissions (read/write/execute)
+
+| Permission             | Command          |
+| ---------------------- | ---------------- |
+| Read only              | `chmod 400 file` |
+| Read + Write           | `chmod 600 file` |
+| Read + Write + Execute | `chmod 700 file` |
+
+Example:
+
+```bash
+sudo chmod 755 filename
+```
+
+---
+
+## 2️⃣ Give a user permission using groups (BEST PRACTICE)
+
+### ➤ Add user to a group
+
+```bash
+sudo usermod -aG groupname arjun
+```
+
+Example (give access to `/var/www`):
+
+```bash
+sudo usermod -aG www-data arjun
+sudo chown -R www-data:www-data /var/www
+sudo chmod -R 775 /var/www
+```
+
+⚠️ User must **log out and log back in** to apply group changes.
+
+---
+
+## 3️⃣ Give sudo (admin) permissions 🔥
+
+### ➤ Add user to sudo group
+
+```bash
+sudo usermod -aG sudo arjun
+```
+
+Verify:
+
+```bash
+groups arjun
+```
+
+Test:
+
+```bash
+su - arjun
+sudo whoami
+```
+
+Output should be:
+
+```text
+root
+```
+
+---
+
+## 4️⃣ Give permission to execute a script
+
+```bash
+chmod +x script.sh
+```
+
+---
+
+## 5️⃣ Check current permissions
+
+```bash
+ls -l filename
+```
+
+Output:
+
+```text
+-rwxr-xr-- 1 arjun arjun file
+```
+
+---
+
+## 🔑 Quick summary
+
+| Task              | Command                  |
+| ----------------- | ------------------------ |
+| File ownership    | `chown`                  |
+| File permissions  | `chmod`                  |
+| Add user to group | `usermod -aG`            |
+| Give sudo access  | `usermod -aG sudo arjun` |
+
+---
+
+### Tell me exactly **what permission** you want:
+
+* File/folder access?
+* Sudo access?
+* Service (Docker, Apache, etc.)?
+* Read-only or full control?
+
+I’ll give you the **exact command** for your case.
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+12-01-25
+
+INPUT:
+root@DESKTOP-URQMPG6:/etc# sudo usermod -shell /bin/bash arjun usermod: invalid shell 'hell' give solution
+---------------------------------------------------
+
+The error is due to **incorrect option usage and a typo**.
+
+### What went wrong
+
+You ran:
+
+```bash
+sudo usermod -shell /bin/bash arjun
+```
+
+Problems:
+
+1. ❌ `-shell` is **not a valid option**
+2. ❌ The error shows `'hell'` because `usermod` misread the argument
+3. ✅ The correct option is **`-s`** (lowercase s)
+
+---
+
+### ✅ Correct command
+
+```bash
+sudo usermod -s /bin/bash arjun
+```
+
+---
+
+### 🔍 Verify the change
+
+```bash
+getent passwd arjun
+```
+
+or
+
+```bash
+grep arjun /etc/passwd
+```
+
+You should see `/bin/bash` at the end of the line.
+
+---
+
+### 🛠 If you still get an error
+
+Make sure `/bin/bash` is a valid shell:
+
+```bash
+cat /etc/shells
+```
+
+If it’s missing (rare), install bash:
+
+```bash
+sudo apt install bash
+```
+
+---
+
+### 📌 Summary
+
+* Use `-s`, **not** `-shell`
+* Correct command:
+
+  ```bash
+  sudo usermod -s /bin/bash arjun
+  ```
+
+If you want to **change the default shell for new users** or **switch shells without sudo**, tell me 👍
+-----------------------------------------------------------------------------------------------------------------------
+INPUT: how to give permissions to user
+--------------------------------------
+In Linux, permissions can mean **file/folder access** or **administrative (sudo) access**. Below are the **most common cases**, with clear commands.
+
+---
+
+## 1️⃣ Give a user permission to a file or directory
+
+### ➤ Change ownership (recommended)
+
+Give full control to a user:
+
+```bash
+sudo chown arjun:arjun filename
+```
+
+For a directory (recursive):
+
+```bash
+sudo chown -R arjun:arjun /path/to/directory
+```
+
+---
+
+### ➤ Change permissions (read/write/execute)
+
+| Permission             | Command          |
+| ---------------------- | ---------------- |
+| Read only              | `chmod 400 file` |
+| Read + Write           | `chmod 600 file` |
+| Read + Write + Execute | `chmod 700 file` |
+
+Example:
+
+```bash
+sudo chmod 755 filename
+```
+
+---
+
+## 2️⃣ Give a user permission using groups (BEST PRACTICE)
+
+### ➤ Add user to a group
+
+```bash
+sudo usermod -aG groupname arjun
+```
+
+Example (give access to `/var/www`):
+
+```bash
+sudo usermod -aG www-data arjun
+sudo chown -R www-data:www-data /var/www
+sudo chmod -R 775 /var/www
+```
+
+⚠️ User must **log out and log back in** to apply group changes.
+
+---
+
+## 3️⃣ Give sudo (admin) permissions 🔥
+
+### ➤ Add user to sudo group
+
+```bash
+sudo usermod -aG sudo arjun
+```
+
+Verify:
+
+```bash
+groups arjun
+```
+
+Test:
+
+```bash
+su - arjun
+sudo whoami
+```
+
+Output should be:
+
+```text
+root
+```
+
+---
+
+## 4️⃣ Give permission to execute a script
+
+```bash
+chmod +x script.sh
+```
+
+---
+
+## 5️⃣ Check current permissions
+
+```bash
+ls -l filename
+```
+
+Output:
+
+```text
+-rwxr-xr-- 1 arjun arjun file
+```
+
+---
+
+## 🔑 Quick summary
+
+| Task              | Command                  |
+| ----------------- | ------------------------ |
+| File ownership    | `chown`                  |
+| File permissions  | `chmod`                  |
+| Add user to group | `usermod -aG`            |
+| Give sudo access  | `usermod -aG sudo arjun` |
+
+---
+
+### Tell me exactly **what permission** you want:
+
+* File/folder access?
+* Sudo access?
+* Service (Docker, Apache, etc.)?
+* Read-only or full control?
+
+I’ll give you the **exact command** for your case.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+INPUT: root@DESKTOP-URQMPG6:/# ssh -i arjun.pem arjun@35.154.45.218
+The authenticity of host '35.154.45.218 (35.154.45.218)' can't be established.
+ED25519 key fingerprint is SHA256:LM+Y9wlFUg0deggsw9N7MIXYAAEIFtQwZws9lD7z/1Y.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '35.154.45.218' (ED25519) to the list of known hosts.
+arjun@35.154.45.218: Permission denied (publickey).
+give solution
+
+------------------------------------------------------------The error **`Permission denied (publickey)`** means the server **did not accept your SSH key**. This is very common and fixable. Follow these steps **in order**.
+
+---
+
+## ✅ Step 1: Fix key file permissions (MOST COMMON ISSUE)
+
+On your local machine:
+
+```bash
+chmod 400 arjun.pem
+```
+
+Then try again:
+
+```bash
+ssh -i arjun.pem arjun@35.154.45.218
+```
+
+---
+
+## ✅ Step 2: Verify correct username (VERY IMPORTANT)
+
+If this is a **cloud VM**, the username is often **NOT** `arjun`.
+
+Common usernames:
+
+| Provider         | Username   |
+| ---------------- | ---------- |
+| AWS Ubuntu       | `ubuntu`   |
+| AWS Amazon Linux | `ec2-user` |
+| RHEL             | `ec2-user` |
+| Debian           | `admin`    |
+
+Try:
+
+```bash
+ssh -i arjun.pem ubuntu@35.154.45.218
+```
+
+or
+
+```bash
+ssh -i arjun.pem ec2-user@35.154.45.218
+```
+
+⚠️ Using the wrong username **will always fail**, even with the correct key.
+
+---
+
+## ✅ Step 3: Ensure the key matches the server
+
+Make sure:
+
+* `arjun.pem` is the **same key** used when creating the instance
+* You are **not using a different key**
+
+Check key fingerprint:
+
+```bash
+ssh-keygen -lf arjun.pem
+```
+
+---
+
+## ✅ Step 4: Use verbose mode to debug
+
+This tells exactly why SSH fails:
+
+```bash
+ssh -vvv -i arjun.pem arjun@35.154.45.218
+```
+
+Look for:
+
+```text
+Offering public key
+Server refused our key
+```
+
+---
+
+## ✅ Step 5: If you HAVE server access (last resort fix)
+
+If you can log in via console/cloud UI:
+
+```bash
+sudo mkdir -p /home/arjun/.ssh
+sudo nano /home/arjun/.ssh/authorized_keys
+```
+
+Paste your **public key**:
+
+```bash
+ssh-keygen -y -f arjun.pem
+```
+
+Fix permissions:
+
+```bash
+sudo chown -R arjun:arjun /home/arjun/.ssh
+sudo chmod 700 /home/arjun/.ssh
+sudo chmod 600 /home/arjun/.ssh/authorized_keys
+```
+
+Restart SSH:
+
+```bash
+sudo systemctl restart ssh
+```
+
+---
+
+## 🔑 Most likely causes (90% cases)
+
+✔ Wrong username
+✔ `.pem` file permissions not `400`
+✔ Key doesn’t match instance
+
+---
+
+### Tell me:
+
+1️⃣ Is this **AWS / Azure / GCP / other**?
+2️⃣ Which OS did you choose (Ubuntu, Amazon Linux)?
+
+I’ll give you the **exact working command** for your setup.
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+INPUT:  
+root@ip-172-31-12-157:~# ssh -i arjun.pem arjun@35.154.45.218
+The authenticity of host '35.154.45.218 (35.154.45.218)' can't be established.
+ED25519 key fingerprint is SHA256:LM+Y9wlFUg0deggsw9N7MIXYAAEIFtQwZws9lD7z/1Y.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '35.154.45.218' (ED25519) to the list of known hosts.
+arjun@35.154.45.218: Permission denied (publickey).
+root@ip-172-31-12-157:~# chmod 400 arjun.pem
+root@ip-172-31-12-157:~# ssh -i arjun.pem arjun@35.154.45.218
+arjun@35.154.45.218: Permission denied (publickey).
+give solution
+----------------------------------------------------------------------------------
+Good, you already fixed the **`.pem` permission** 👍
+Since it **still says `Permission denied (publickey)`**, this confirms **the username or key is wrong**, not the chmod.
+
+You are SSH-ing **from one EC2 to another EC2** (`ip-172-31-12-157 → 35.154.45.218`).
+
+---
+
+## 🔴 ROOT CAUSE (99% sure)
+
+On **AWS EC2**, the default user is **NOT `arjun`** unless you manually created it and added the key.
+
+### Correct usernames by AMI:
+
+| AMI          | Username   |
+| ------------ | ---------- |
+| **Ubuntu**   | `ubuntu`   |
+| Amazon Linux | `ec2-user` |
+| RHEL         | `ec2-user` |
+| CentOS       | `centos`   |
+| Debian       | `admin`    |
+
+---
+
+## ✅ TRY THIS FIRST (MOST LIKELY FIX)
+
+```bash
+ssh -i arjun.pem ubuntu@35.154.45.218
+```
+
+If that fails:
+
+```bash
+ssh -i arjun.pem ec2-user@35.154.45.218
+```
+
+---
+
+## ✅ WHY `arjun` FAILS
+
+SSH keys are checked in:
+
+```text
+/home/arjun/.ssh/authorized_keys
+```
+
+That file **does not exist** or **does not contain your key** on the target server.
+
+---
+
+## ✅ CONFIRM AMI TYPE (AWS Console)
+
+1. Go to **EC2 → Instances**
+2. Select `35.154.45.218`
+3. Check **AMI name**
+
+Example:
+
+* `ubuntu/images/hvm-ssd/ubuntu-jammy-22.04` → use `ubuntu`
+* `amzn2-ami-hvm` → use `ec2-user`
+
+---
+
+## ✅ IF YOU NEED TO LOGIN AS `arjun`
+
+First login with correct default user:
+
+```bash
+ssh -i arjun.pem ubuntu@35.154.45.218
+```
+
+Then create `arjun` and add key:
+
+```bash
+sudo adduser arjun
+sudo mkdir /home/arjun/.ssh
+sudo cp ~/.ssh/authorized_keys /home/arjun/.ssh/
+sudo chown -R arjun:arjun /home/arjun/.ssh
+sudo chmod 700 /home/arjun/.ssh
+sudo chmod 600 /home/arjun/.ssh/authorized_keys
+```
+
+Now this will work:
+
+```bash
+ssh -i arjun.pem arjun@35.154.45.218
+```
+
+---
+
+## 🔍 DEBUG (optional)
+
+```bash
+ssh -vvv -i arjun.pem arjun@35.154.45.218
+```
+
+Look for:
+
+```text
+Server refused our key
+```
+
+---
+
+## ✅ FINAL ANSW (SHORT)
+
+❌ `arjun` is **not a valid SSH user** on the EC2
+✅ Use:
+
+```bash
+ssh -i arjun.pem ubuntu@35.154.45.218
+```
+
+---
+
+If you want, tell me:
+
+* AMI name
+* Region
+* Whether this is **same key pair** used during instance creation
+
+I’ll fix it **step-by-step without console access** if needed.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+INPUT: 
+ubuntu@ip-172-31-12-157:~$ su - arjun
+Password:
+arjun@ip-172-31-12-157:~$ sudo su
+[sudo] password for arjun:
+arjun is not in the sudoers file.
+------------------------------------------------------
+This error is **expected behavior** 👍
+It simply means **user `arjun` does not have sudo (admin) privileges yet**.
+
+You are already logged in as **`ubuntu`**, which *does* have sudo access. So fix is easy.
+
+---
+
+## ✅ SOLUTION: Give sudo access to `arjun`
+
+Run **as `ubuntu` user** (not as `arjun`):
+
+```bash
+sudo usermod -aG sudo arjun
+```
+
+---
+
+## ✅ VERIFY
+
+```bash
+groups arjun
+```
+
+You should see:
+
+```text
+arjun : arjun sudo
+```
+
+---
+
+## ✅ APPLY CHANGES
+
+Switch user again (important):
+
+```bash
+su - arjun
+```
+
+Now test:
+
+```bash
+sudo whoami
+```
+
+Output should be:
+
+```text
+root
+```
+
+---
+
+## 🔐 OPTIONAL (Safer): Allow passwordless sudo
+
+Edit sudoers safely:
+
+```bash
+sudo visudo
+```
+
+Add at the bottom:
+
+```text
+arjun ALL=(ALL) NOPASSWD:ALL
+```
+
+⚠️ Only do this if you understand the security risk.
+
+---
+
+## 🧠 WHY THIS HAPPENED
+
+* `arjun` is a **normal user**
+* Only users in **sudo group** can run `sudo`
+* Ubuntu adds **only `ubuntu` user** by default
+
+---
+
+## ✅ SUMMARY
+
+```bash
+sudo usermod -aG sudo arjun
+su - arjun
+sudo whoami
+```
+
+---
+
+If you want:
+
+* Restrict sudo to **specific commands**
+* Remove sudo later
+* Give sudo without password only for some commands
+
+Tell me 👍
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
