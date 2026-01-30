@@ -1,0 +1,23 @@
+1. Linux Topics
+
+- User creation
+
+- Linux Basics Commands
+
+- Vi editor shortcuts
+
+- awk, find, grep commands
+
+- WinSCP 
+
+- user creation aws machine - accessing in local machine.  done.
+
+- Shell Script - Done
+
+2. Daily activities
+
+- Site watch
+
+- Vertex [Ticket tracking]
+
+- name Records 

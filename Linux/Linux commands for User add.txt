@@ -1,0 +1,58 @@
+sudo useradd test_user --->  to Add a User in Linux
+
+sudo useradd -d /home/test_user test_user ---> to Add User by Specifying a home directory path for the new user
+
+sudo useradd -u 1234 test_user  ---> to Create a User with a Specific User ID (UID)
+
+sudo useradd -g 1000 test_user  ---> to Create a User with a Specific Group ID (GID)
+
+sudo useradd -M test_user  --->  to Create a User Without a Home Directory
+
+sudo useradd -e 2020-05-30 test_user  --->  to Create User with an Expiry Date
+
+sudo useradd -c "This is a test user" test_user  --->  to Create User with a Comment
+
+sudo useradd -s /bin/sh test_user  --->  to Create a User with Changed Login Shell
+
+sudo useradd -p test_password test_user  ---> to Set an Unencrypted Password for the User
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
+sudo usermod --s /bin/bash nishant ---> using this command we can change the bin/bash command
+
+grep arjun /etc/passwd --> shows the shell type of the user
+
+cat /etc/shells ---> to confirm bin/bash installed or not in user Linux machine. If not, use below command to install bash 
+
+apt install bash ---> to install bash in your Linux machine.
+
+sudo chown arjun:arjun filename  ---> to give full access to file for a user
+
+sudo chown arjun:arjun /home/dev/arjun  ---> to give access to the directory
+
+sudo chmod 755 filename  ---> to give permission to the file
+
+sudo usermod -aS groupname arjun  ----> to assign user to particular group
+
+"Sample commands to give access to /var/www dir for a user"
+
+sudo usermod -aG www-data arjun
+sudo chown -R www-data:www-data /var/www
+sudo chmod -R 775 /var/www
+
+sudo usermod -aG sudo arjun ---> to give admin access to a user
+
+
+
+
+
+
+
+
+
+
+
+
+
+

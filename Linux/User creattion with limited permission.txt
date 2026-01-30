@@ -1,0 +1,119 @@
+USER CREATION WITH LIMITED PERMISSION:
+
+#!/bin/bash
+set -e
+
+USERNAME="juniorops"
+PUBLIC_KEY="ssh-rsa AAAAB3NzaC1yc2E... (PASTE FULL PUBLIC KEY HERE)"
+
+# Create user with /bin/rbash (restricted shell)
+useradd -m -s /bin/rbash "$USERNAME"
+
+# Set up authorized_keys
+mkdir -p /home/"$USERNAME"/.ssh
+echo "$PUBLIC_KEY" > /home/"$USERNAME"/.ssh/authorized_keys
+
+# Lock down permissions
+chown -R "$USERNAME":"$USERNAME" /home/"$USERNAME"/.ssh
+chmod 700 /home/"$USERNAME"/.ssh
+chmod 600 /home/"$USERNAME"/.ssh/authorized_keys
+chmod 755 /home/"$USERNAME"  # must be executable to enter
+
+# Create restricted .bashrc
+cat > /home/"$USERNAME"/.bashrc << 'EOF'
+# Restricted environment
+export PATH="/usr/bin:/bin"
+readonly PATH
+export SHELL=/bin/rbash
+readonly SHELL
+PS1="[juniorops@\\h \\W]\\$ "
+EOF
+
+chown "$USERNAME":"$USERNAME" /home/"$USERNAME"/.bashrc
+chmod 644 /home/"$USERNAME"/.bashrc
+
+# Make .bashrc immutable (prevent tampering)
+chattr +i /home/"$USERNAME"/.bashrc
+
+# Optional: disable history
+touch /home/"$USERNAME"/.bash_history
+chattr +i /home/"$USERNAME"/.bash_history
+
+echo "User $USERNAME created with restricted shell."
+
+===================================================================================================================================
+CREATE ONE FILE : NAME THE FILE AS $USERNAME : IN "/etc/sudoers.d"
+
+"it will limits the permission to the user"
+
+
+# Only allow specific operational commands
+Cmnd_Alias SAFE_COMMANDS = \
+    /bin/systemctl start *, \
+    /bin/systemctl stop *, \
+    /bin/systemctl status *, \
+    /usr/bin/systemctl start *, \
+    /usr/bin/systemctl stop *, \
+    /usr/bin/systemctl status *, \
+    /bin/df, \
+    /bin/df *, \
+    /bin/free, \
+    /usr/bin/free, \
+    /bin/ps, \
+    /usr/bin/ps, \
+    /usr/bin/top, \
+    /bin/cat, \
+    /usr/bin/tail, \
+    /bin/ls, \
+    /bin/ls *, \
+    /bin/du, \
+    /bin/du *
+
+# Grant passwordless sudo for allowed commands
+juniorops ALL=(ALL) NOPASSWD: SAFE_COMMANDS
+
+# Explicitly deny dangerous commands (defense in depth)
+juniorops ALL=!/bin/rm, !/bin/rmdir, !/bin/mv, !/bin/cp, !/bin/chmod, !/bin/chown, \
+			!/bin/mkdir, !/usr/bin/mkdir, \
+           !/usr/bin/apt, !/usr/bin/yum, !/bin/vim, !/bin/nano, !/bin/sed, !/usr/bin/crontab
+
+=============================================================================================================================================
+
+HAVE TO GIVE ALLOW OR DENY PERMISSIONS AS PER BELOW ORDER IN THIS FILE "/etc/ssh/sshd_config"
+
+PasswordAuthentication no
+PermitRootLogin no
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/authorized_keys
+
+============================================================================================================================================
+
+AFTER THAT HAVE TO RELOAD THE SSHD
+
+"sudo systemctl reload sshd"
+
+============================================================================================================================================
+BELOW MENTIONED COMMANDS ARE PERMITABLE TO THE USER TO RUN ON LINUX MACHINE
+
+# Check disk
+df -h
+
+# Check memory
+free -m
+
+# View logs
+tail /var/log/syslog
+cat /var/log/app.log
+
+# List files
+ls /var/www
+
+# Check running processes
+ps aux
+
+# Start/stop services (example)
+sudo systemctl start nginx
+sudo systemctl stop myapp
+sudo systemctl status nginx
+
+============================================================================================================================================

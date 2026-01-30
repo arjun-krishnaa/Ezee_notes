@@ -1,0 +1,12 @@
+setfacl -m u:produser:rwx /var/log/nginx/  -  Access control list to give permission to folder with out change in ownership.
+
+chattr +i /home/produser/.ssh/authorized_keys
+chattr +i ~.ssh/authorized_keys     - -----------------------------------------> immutable the folder
+
+
+sudo chattr -i /home/ec2-user/.ssh/authorized_keys
+vi /home/ec2-user/.ssh/authorized_keys
+sudo chattr +i /home/ec2-user/.ssh/authorized_keys ------------------------------unfreeze mutable
+
+restorecon -Rv /home/ec2-user/.ssh --------------------------------------- secure uses access
+

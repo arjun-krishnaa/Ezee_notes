@@ -1,0 +1,5 @@
+1. Unix/Linux - The vi Editor Tutorial ---> https://www.tutorialspoint.com/unix/unix-vi-editor.htm
+
+2. Linux/Unix Tutorial  ---> https://www.tutorialspoint.com/unix/index.htm 
+
+3. DNS record types with examples ---> https://www.techepages.com/list-of-all-dns-records-with-examples/

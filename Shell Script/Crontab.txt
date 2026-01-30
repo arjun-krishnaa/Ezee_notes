@@ -1,0 +1,83 @@
+Yes 👍 — **the cron timing syntax is correct**, but **there are a couple of important checks** to make sure it actually runs.
+
+---
+
+## ✅ Cron Schedule Explained
+
+```
+*/15 * * * *
+```
+
+➡ Runs **every 15 minutes** (00, 15, 30, 45)
+
+---
+
+## ✅ Full Cron Entry (Best Practice)
+
+```cron
+*/15 * * * * /bin/bash /home/shell_script/disk_mem_che.sh
+```
+
+---
+
+## ⚠️ Things to Verify (Very Important)
+
+### 1️⃣ Script has execute permission
+
+```bash
+chmod +x /home/shell_script/disk_mem_che.sh
+```
+
+---
+
+### 2️⃣ Script has correct shebang
+
+At the **top of `disk_mem_che.sh`**:
+
+```bash
+#!/bin/bash
+```
+
+---
+
+### 3️⃣ Use full paths inside the script
+
+Cron does **not** load your environment.
+
+❌ Wrong:
+
+```bash
+df -h
+```
+
+✅ Correct:
+
+```bash
+/bin/df -h
+```
+
+---
+
+### 4️⃣ Redirect output (to avoid cron mail)
+
+```cron
+*/15 * * * * /bin/bash /home/shell_script/disk_mem_che.sh >> /home/shell_script/disk_mem_che.log 2>&1
+```
+
+---
+
+### 5️⃣ Confirm cron is running
+
+```bash
+crontab -l
+```
+
+---
+
+## ✅ Final Recommended Entry
+
+```cron
+*/15 * * * * /bin/bash /home/shell_script/disk_mem_che.sh >> /home/shell_script/disk_mem_che.log 2>&1
+```
+
+If you want, paste your **disk_mem_che.sh** here and I’ll validate it line-by-line 🚀

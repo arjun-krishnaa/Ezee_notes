@@ -1,0 +1,415 @@
+1. sudo apt update ---> "to update system"
+
+2. sudo apt install default-jdk  ----> "to install java default version"
+
+3. sudo useradd -r -m -U -d /opt/tomcat -s /bin/false tomcat  ---> "create user for tomcat and create sets home directory for tomcat"
+
+4. wget https://dlcdn.apache.org/tomcat/tomcat-10/v10.1.50/bin/apache-tomcat-10.1.50.tar.gz ---> "download apache tomcat"
+
+5. sudo tar xf apache-tomcat-10.1.50.tar.gz -C /opt/tomcat ---> "untar tomcat files"
+
+6. sudo ln -s /opt/tomcat/apache-tomcat-10.1.50/ /opt/tomcat/updated ---> "create symbolic link for tomcat file"
+
+7. sudo chown -R tomcat: /opt/tomcat/* ---> "changing ownership for tomcat"
+
+8. sudo sh -c 'chmod +x /opt/tomcat/updated/bin/*.sh' ---> "give execute permission to all files in bin directory"
+
+9. sudo vi /etc/systemd/system/tomcat.service -----> "have to paste below mentioned script"
+
+NOTE: if failed, start manually using ---> /opt/tomcat/updated/bin/startup.sh
+-------
+10. sudo systemctl daemon-reload 
+
+11. sudo systemctl start tomcat
+
+12. sudo systemctl enable tomcat
+
+13. sudo ufw allow 8080/tcp
+
+14. http://<YourIPAddress>:8080
+
+15. Download or place a war file in webapps to access through internet
+
+16. /opt/tomcat/webapps --> dir to place war file
+
+17. http://<YourIPAddress>:8080/sample ---> add "file name in tomcat link to see the deployment"
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+[Unit]
+Description=Apache Tomcat Web Application Container
+After=network.target
+
+[Service]
+Type=forking
+
+Environment="JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64"
+Environment="CATALINA_PID=/opt/tomcat/updated/temp/tomcat.pid"
+Environment="CATALINA_HOME=/opt/tomcat/updated/"
+Environment="CATALINA_BASE=/opt/tomcat/updated/"
+Environment="CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC"
+Environment="JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom"
+
+ExecStart=/opt/tomcat/updated/bin/startup.sh
+ExecStop=/opt/tomcat/updated/bin/shutdown.sh
+
+User=tomcat
+Group=tomcat
+UMask=0007
+RestartSec=10
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+CHAT GPT VERSION
+
+Short answer: **Yes, this will work**, and your Tomcat should start on port 8080.
+However, there are **a few issues, risks, and improvements** you should be aware of. I’ll go step-by-step and then give you a **cleaned-up “correct” version**.
+
+---
+
+## ✅ What is correct in your setup
+
+✔ Java installation (`default-jdk`)
+✔ Dedicated non-login `tomcat` user
+✔ Installing Tomcat under `/opt`
+✔ Using `systemd` service
+✔ Running Tomcat as non-root
+✔ Opening port `8080`
+✔ Accessing via `http://<IP>:8080`
+
+These are all **best practices** 👍
+
+---
+
+## ⚠️ Issues / Improvements You Should Fix
+
+### 1️⃣ Tomcat version is **very old**
+
+You are installing:
+
+```
+Tomcat 9.0.34  (released in 2020)
+```
+
+This version has **known security vulnerabilities**.
+
+🔴 **Recommendation**
+Use the latest Tomcat 9 or 10 version.
+
+Example:
+
+```bash
+https://downloads.apache.org/tomcat/tomcat-9/v9.0.xx/bin/apache-tomcat-9.0.xx.tar.gz
+```
+
+---
+
+### 2️⃣ `JAVA_HOME` path may be incorrect
+
+You hardcoded:
+
+```ini
+Environment="JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64"
+```
+
+This path **depends on OS and Java version**.
+
+✔ Verify it first:
+
+```bash
+readlink -f /usr/bin/java | sed "s:bin/java::"
+```
+
+Typical correct value:
+
+```ini
+/usr/lib/jvm/java-11-openjdk-amd64
+```
+
+❌ If this path is wrong → Tomcat will **not start**
+
+---
+
+### 3️⃣ Tar extraction creates nested directory
+
+You ran:
+
+```bash
+sudo tar xf apache-tomcat-9.0.34.tar.gz -C /opt/tomcat
+```
+
+This results in:
+
+```
+/opt/tomcat/apache-tomcat-9.0.34/
+```
+
+That’s fine **because you created a symlink**, but cleaner is:
+
+```bash
+sudo tar xf apache-tomcat-9.0.34.tar.gz -C /opt/tomcat --strip-components=1
+```
+
+(Then no symlink needed)
+
+---
+
+### 4️⃣ `chmod +x *.sh` is unnecessary
+
+Tomcat scripts are already executable.
+
+This line is **safe but redundant**:
+
+```bash
+sudo sh -c 'chmod +x /opt/tomcat/updated/bin/*.sh'
+```
+
+---
+
+### 5️⃣ UFW rule may not be needed
+
+If UFW is disabled, this does nothing:
+
+```bash
+sudo ufw allow 8080/tcp
+```
+
+Check status:
+
+```bash
+sudo ufw status
+```
+
+---
+
+## ✅ Your `tomcat.service` – Is it correct?
+
+### ✔ Mostly correct
+
+But here is a **slightly improved and safer version**:
+
+```ini
+[Unit]
+Description=Apache Tomcat Web Application Container
+After=network.target
+
+[Service]
+Type=forking
+
+Environment="JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64"
+Environment="CATALINA_PID=/opt/tomcat/updated/temp/tomcat.pid"
+Environment="CATALINA_HOME=/opt/tomcat/updated"
+Environment="CATALINA_BASE=/opt/tomcat/updated"
+Environment="CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC"
+Environment="JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom"
+
+ExecStart=/opt/tomcat/updated/bin/startup.sh
+ExecStop=/opt/tomcat/updated/bin/shutdown.sh
+
+User=tomcat
+Group=tomcat
+UMask=0007
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+
+---
+
+## ✅ How to confirm everything is working
+
+```bash
+sudo systemctl status tomcat
+```
+
+```bash
+ss -tulnp | grep 8080
+```
+
+Logs:
+
+```bash
+/opt/tomcat/updated/logs/catalina.out
+```
+
+Browser:
+
+```
+http://<server-ip>:8080
+```
+
+---
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+```bash
+useradd -r -m -U -d /opt/tomcat -s /bin/false tomcat
+```
+
+This command **creates a system user named `tomcat`**, specifically intended to run the Tomcat service securely.
+
+---
+
+## 🔍 Breakdown of each option
+
+### `useradd`
+
+Creates a new user account in Linux.
+
+---
+
+### `-r` → *System user*
+
+```bash
+-r
+```
+
+* Creates a **system account**
+* System users:
+
+  * Usually have **UID < 1000**
+  * Are meant for services (not human login)
+* Prevents accidental interactive use
+
+✔ Best practice for services like Tomcat
+
+---
+
+### `-m` → *Create home directory*
+
+```bash
+-m
+```
+
+* Creates the user’s home directory
+* Without `-m`, the directory would **not be created**
+
+In your case:
+
+```
+/opt/tomcat
+```
+
+---
+
+### `-U` → *Create group*
+
+```bash
+-U
+```
+
+* Creates a group **with the same name as the user**
+* `tomcat` user → `tomcat` group
+* Makes permission management easier
+
+Equivalent to:
+
+```bash
+groupadd tomcat
+useradd -g tomcat tomcat
+```
+
+---
+
+### `-d /opt/tomcat` → *Home directory location*
+
+```bash
+-d /opt/tomcat
+```
+
+* Sets the **home directory** of the user
+* Instead of default:
+
+  ```
+  /home/tomcat
+  ```
+* Used because Tomcat lives in `/opt/tomcat`
+
+---
+
+### `-s /bin/false` → *Disable shell access*
+
+```bash
+-s /bin/false
+```
+
+* Prevents the user from logging in
+* If someone tries:
+
+  ```bash
+  su - tomcat
+  ```
+
+  → login fails
+
+✔ Improves security
+✔ Service account only
+
+---
+
+### `tomcat`
+
+```bash
+tomcat
+```
+
+* The **username** being created
+
+---
+
+## ✅ What this command accomplishes
+
+After running it, you get:
+
+| Feature        | Result             |
+| -------------- | ------------------ |
+| User           | `tomcat`           |
+| Group          | `tomcat`           |
+| Home directory | `/opt/tomcat`      |
+| Login shell    | Disabled           |
+| Purpose        | Run Tomcat service |
+
+---
+
+## 🔐 Why this is a best practice
+
+✔ Runs Tomcat as **non-root**
+✔ Limits system access
+✔ Prevents SSH/login abuse
+✔ Improves system security
+
+---
+
+## 🔎 Verify the user
+
+```bash
+id tomcat
+```
+
+```bash
+getent passwd tomcat
+```
+
+Example output:
+
+```
+tomcat:x:999:999::/opt/tomcat:/bin/false
+```
+
+---
+
+## 🧠 In simple terms
+
+> “Create a **non-login system user** called `tomcat`, give it a **home directory at `/opt/tomcat`**, and use it **only to run Tomcat securely**.”
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
