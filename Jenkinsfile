@@ -119,7 +119,7 @@ def deployViaSSMCommand() {
         set -e
         
         # Variables
-        BUILD_NUM="${BUILD_NUMBER}"
+        BUILD_NUM='${env.BUILD_NUMBER}'
         BUCKET="your-deployment-bucket"
         APP_NAME="myapp"
         DEPLOY_DIR="/home/ec2-user/jenkins/demo_bus"
