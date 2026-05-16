@@ -122,7 +122,7 @@ def deployViaSSMCommand() {
         BUILD_NUM="${BUILD_NUMBER}"
         BUCKET="your-deployment-bucket"
         APP_NAME="myapp"
-        DEPLOY_DIR="${DEPLOY_PATH}"
+        DEPLOY_DIR="${/home/ec2-user/jenkins/demo/bus}"
         BACKUP_DIR="/opt/backups"
         TIMESTAMP=\\$(date +%Y%m%d_%H%M%S)
         
