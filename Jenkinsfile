@@ -4,16 +4,16 @@ pipeline {
     
     environment {
         // AWS Configuration
-        AWS_REGION = 'ap-south-1'                    // Change to your region
-        AWS_CREDENTIALS_ID = 'aws-credentials'      // Jenkins credential ID for AWS
+        AWS_REGION = 'ap-south-1'
+        AWS_CREDENTIALS_ID = 'aws-credentials'
         
         // GitHub Configuration
         GITHUB_REPO = 'https://github.com/arjun-krishnaa/Ezee_notes.git'
-        GITHUB_CREDENTIALS_ID = 'FINE_GRAIN'      // Jenkins credential ID for GitHub
+        GITHUB_CREDENTIALS_ID = 'FINE_GRAIN'
         
         // Target EC2 Configuration
-        EC2_INSTANCE_ID = 'i-0ba0467f8f682e4f8'     // Your EC2 instance ID
-        DEPLOY_PATH = '/home/ec2-user/jenkins/demo/bus'                  // Deployment path on EC2
+        EC2_INSTANCE_ID = 'i-0ba0467f8f682e4f8'
+        DEPLOY_PATH = '/home/ec2-user/jenkins/demo/bus'
         
         // Build artifacts
         ARTIFACT_NAME = 'app-release.tar.gz'
@@ -35,10 +35,6 @@ pipeline {
             steps {
                 sh '''
                     echo "Running build steps..."
-                    # Add your build commands here
-                    # npm install && npm run build
-                    # or: mvn clean package
-                    # or: docker build -t myapp:${BUILD_NUMBER} .
                 '''
             }
         }
@@ -68,11 +64,7 @@ pipeline {
             steps {
                 withAWS(credentials: "${AWS_CREDENTIALS_ID}", region: "${AWS_REGION}") {
                     script {
-                        // Method 1: Using AWS CLI SSM send-command
                         deployViaSSMCommand()
-                        
-                        // Method 2: Using SSM Session (alternative)
-                        // deployViaSSMSession()
                     }
                 }
             }
@@ -104,7 +96,6 @@ pipeline {
         }
         failure {
             echo "Deployment failed! Check logs."
-            // Add notification: Slack, Email, etc.
         }
     }
 }
@@ -112,57 +103,63 @@ pipeline {
 // ============== SSM Deployment Methods ==============
 
 def deployViaSSMCommand() {
-    // Method 1: AWS-RunShellScript Document
-    // Downloads artifact from S3 and deploys on EC2
+    // FIX: Use ''' (triple single quotes) to prevent Groovy interpolation
+    // Then concatenate Groovy variables explicitly where needed
     
-    def deployScript = """
-        set -e
-        
-        # Variables
-        BUILD_NUM='${env.BUILD_NUMBER}'
-        BUCKET="your-deployment-bucket"
-        APP_NAME="myapp"
-        DEPLOY_DIR="/home/ec2-user/jenkins/demo_bus"
-        BACKUP_DIR="/opt/backups"
-        TIMESTAMP=\\$(date +%Y%m%d_%H%M%S)
-        
-        echo "=== Starting Deployment: Build #\\${BUILD_NUM} ==="
-        
-        # Create necessary directories
-        sudo mkdir -p \\${DEPLOY_DIR} \\${BACKUP_DIR}
-        
-        # Backup current version
-        if [ -d "\\${DEPLOY_DIR}" ] && [ "\\$(ls -A \\${DEPLOY_DIR})" ]; then
-            echo "Creating backup..."
-            sudo tar -czf \\${BACKUP_DIR}/\\${APP_NAME}_\\${TIMESTAMP}.tar.gz -C \\${DEPLOY_DIR} .
-        fi
-        
-        # Download new artifact from S3
-        echo "Downloading artifact from S3..."
-        sudo aws s3 cp s3://\\${BUCKET}/builds/\\${BUILD_NUM}/${ARTIFACT_NAME} /tmp/\\${BUILD_NUM}_${ARTIFACT_NAME}
-        
-        # Extract to deployment directory
-        echo "Extracting artifact..."
-        sudo rm -rf \\${DEPLOY_DIR}/*
-        sudo tar -xzf /tmp/\\${BUILD_NUM}_${ARTIFACT_NAME} -C \\${DEPLOY_DIR}
-        
-        # Set proper permissions
-        sudo chown -R ec2-user:ec2-user \\${DEPLOY_DIR}
-        
-        # Run post-deployment scripts
-        echo "Running post-deployment..."
-        cd \\${DEPLOY_DIR}
-        
-        # Example: Install dependencies and restart service
-        # npm install --production
-        # sudo systemctl restart myapp
-        
-        # Cleanup
-        sudo rm -f /tmp/\\${BUILD_NUM}_${ARTIFACT_NAME}
-        
-        echo "=== Deployment Complete ==="
-    """.stripIndent()
+    def buildNum = env.BUILD_NUMBER
+    def artifactName = env.ARTIFACT_NAME ?: 'app-release.tar.gz'
+    def deployDir = '/home/ec2-user/jenkins/bus'
+    def backupDir = '/opt/backups'
+    def bucket = 'your-deployment-bucket'
     
+    def deployScript = '''#!/bin/bash
+set -e
+
+BUILD_NUM="''' + buildNum + '''"
+BUCKET="''' + bucket + '''"
+APP_NAME="myapp"
+DEPLOY_DIR="''' + deployDir + '''"
+BACKUP_DIR="''' + backupDir + '''"
+ARTIFACT_NAME="''' + artifactName + '''"
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+
+echo "=== Starting Deployment: Build #${BUILD_NUM} ==="
+
+# Create necessary directories
+sudo mkdir -p ${DEPLOY_DIR} ${BACKUP_DIR}
+
+# Backup current version
+if [ -d "${DEPLOY_DIR}" ] && [ "$(ls -A ${DEPLOY_DIR})" ]; then
+    echo "Creating backup..."
+    sudo tar -czf ${BACKUP_DIR}/${APP_NAME}_${TIMESTAMP}.tar.gz -C ${DEPLOY_DIR} .
+fi
+
+# Download new artifact from S3
+echo "Downloading artifact from S3..."
+sudo aws s3 cp s3://${BUCKET}/builds/${BUILD_NUM}/${ARTIFACT_NAME} /tmp/${BUILD_NUM}_${ARTIFACT_NAME}
+
+# Extract to deployment directory
+echo "Extracting artifact..."
+sudo rm -rf ${DEPLOY_DIR}/*
+sudo tar -xzf /tmp/${BUILD_NUM}_${ARTIFACT_NAME} -C ${DEPLOY_DIR}
+
+# Set proper permissions
+sudo chown -R ec2-user:ec2-user ${DEPLOY_DIR}
+
+# Run post-deployment scripts
+echo "Running post-deployment..."
+cd ${DEPLOY_DIR}
+
+# Example: Install dependencies and restart service
+# npm install --production
+# sudo systemctl restart myapp
+
+# Cleanup
+sudo rm -f /tmp/${BUILD_NUM}_${ARTIFACT_NAME}
+
+echo "=== Deployment Complete ==="
+'''.stripIndent()
+
     // Execute via SSM
     sh """
         COMMAND_ID=\$(aws ssm send-command \
@@ -192,11 +189,7 @@ def deployViaSSMCommand() {
 }
 
 def deployViaSSMSession() {
-    // Method 2: Using SSM Session for interactive-like deployment
-    // Useful for complex deployments requiring multiple steps
-    
     sh """
-        # Start SSM session and execute deployment
         aws ssm start-session \
             --target "${EC2_INSTANCE_ID}" \
             --region ${AWS_REGION} \
