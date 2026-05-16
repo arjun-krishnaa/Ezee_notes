@@ -4,16 +4,16 @@ pipeline {
     
     environment {
         // AWS Configuration
-        AWS_REGION = 'us-east-1'                    // Change to your region
+        AWS_REGION = 'ap-south-1'                    // Change to your region
         AWS_CREDENTIALS_ID = 'aws-credentials'      // Jenkins credential ID for AWS
         
         // GitHub Configuration
-        GITHUB_REPO = 'https://github.com/your-org/your-repo.git'
-        GITHUB_CREDENTIALS_ID = 'github-token'      // Jenkins credential ID for GitHub
+        GITHUB_REPO = 'https://github.com/arjun-krishnaa/Ezee_notes.git'
+        GITHUB_CREDENTIALS_ID = 'FINE_GRAIN'      // Jenkins credential ID for GitHub
         
         // Target EC2 Configuration
-        EC2_INSTANCE_ID = 'i-0123456789abcdef0'     // Your EC2 instance ID
-        DEPLOY_PATH = '/opt/myapp'                  // Deployment path on EC2
+        EC2_INSTANCE_ID = 'i-0ba0467f8f682e4f8'     // Your EC2 instance ID
+        DEPLOY_PATH = '/home/ec2-user/jenkins/demo/bus'                  // Deployment path on EC2
         
         // Build artifacts
         ARTIFACT_NAME = 'app-release.tar.gz'
