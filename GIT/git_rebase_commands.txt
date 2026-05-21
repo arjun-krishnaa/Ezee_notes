@@ -1,0 +1,63 @@
+```bash
+# Check current branch
+git branch
+
+# Switch to live-agent branch
+git checkout live-agent
+
+# Fetch latest changes from remote
+git fetch origin
+
+# Pull with rebase
+git pull --rebase origin live-agent
+```
+
+If you already have local changes, stash them first:
+
+```bash
+git stash
+git pull --rebase origin live-agent
+git stash pop
+```
+
+If any conflict occurs during rebase:
+
+```bash
+# After resolving conflicts
+git add .
+
+# Continue rebase
+git rebase --continue
+```
+
+To cancel the rebase:
+
+```bash
+git rebase --abort
+
+```
+ git stash
+  156  git pull
+  157  git status
+  158  git restore --staged
+  159  git add .
+  160  git status
+  161  git stash
+  162  git pull
+  163  git stash pop
+
+
+ 823  git branch
+  824  git switch release
+  825  git stash
+  826  git switch release
+  827  ls
+  828  git switch pre-release
+  829  git switch release
+  830  git pull
+  831  ping elcarebus.com
+  832  ping srirenutravels.in
+  833  git switch release
+  834  git pull
+  835  ls
+  836  git stash pop

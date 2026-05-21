@@ -1,0 +1,105 @@
+Basic Commands
+
+vim [filename]: Open a file in Vi or Vim.
+
+:w: Save the file.
+
+:q: Quit if no changes have been made.
+
+:q!: Quit without saving changes.
+
+:wq or ZZ: Save and exit.
+
+Insert Mode
+
+i: Insert at the cursor.
+
+a: Insert after the cursor.
+
+I: Insert at the beginning of the line.
+
+A: Insert at the end of the line.
+
+o: Insert a new line below the current line.
+
+O: Insert a new line above the current line.
+
+ESC: Exit insert mode.
+
+Navigation
+
+h: Move left.
+
+l: Move right.
+
+j: Move down.
+
+k: Move up.
+
+w: Move forward one word.
+
+b: Move backward one word.
+
+0: Move to the beginning of the line.
+
+$: Move to the end of the line.
+
+gg: Go to the first line.
+
+G: Go to the last line.
+
+nG: Go to the nth line.
+
+Editing
+
+x: Delete a single character.
+
+dd: Delete the current line.
+
+ndd: Delete the next n lines.
+
+D: Delete from the cursor to the end of the line.
+
+u: Undo the last change.
+
+Ctrl + r: Redo the last undone change.
+
+Copy and Paste
+
+yy: Yank (copy) the current line.
+
+nyy: Yank the next n lines.
+
+p: Paste after the cursor.
+
+P: Paste before the cursor.
+
+Search and Replace
+
+/pattern: Search for a pattern.
+
+n: Repeat the search in the same direction.
+
+:%s/old/new/g: Replace all occurrences of "old" with "new".
+
+:%s/old/new/gc: Replace all occurrences with confirmation.
+
+Visual Mode
+
+v: Start visual mode.
+
+V: Start linewise visual mode.
+
+Ctrl + v: Start block visual mode.
+
+y: Yank selected text.
+
+d: Delete selected text.
+
+Miscellaneous
+
+:set nu: Show line numbers.
+
+:set nonu: Hide line numbers.
+
+:help [command]: Open help for a specific command.

@@ -1,0 +1,34 @@
+[Unit]
+
+| Directive | Purpose          |
+| --------- | ---------------- |
+| After=    | Start order only |
+| Requires= | Hard dependency  |
+| Wants=    | Soft dependency  |
+-------------------------------------------------
+
+| Target            | Used For                   |
+| ----------------- | -------------------------- |
+| multi-user.target | Servers (most common)      |
+| graphical.target  | Desktop systems            |
+| default.target    | System’s default boot mode |
+| rescue.target     | Maintenance mode           |
+| emergency.target  | Emergency recovery         |
+
+Also  ---> if you want to another server using this
+Required by ----> only starts only after the mentioned service starts
+
+
+
+
+| Command / Directive              | Purpose                                        |
+| -------------------------------- | ---------------------------------------------- |
+| `Wants=`                         | Soft dependency, runtime startup order         |
+| `WantedBy=`                      | Target association, used when enabling at boot |
+| `systemctl enable`               | Creates symlink in `<target>.wants/`           |
+| `systemctl disable`              | Removes symlink                                |
+| `systemctl get-default`          | Show default boot target                       |
+| `systemctl set-default <target>` | Set default boot target                        |
+| `systemctl isolate <target>`     | Switch to target immediately (temporary)       |
+
+

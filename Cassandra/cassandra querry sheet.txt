@@ -1,0 +1,22 @@
+CASSANDRA VERSION:
+
+cassandra@cqlsh:chatcore_chat> show version;
+[cqlsh 6.2.1 | Cassandra 4.1.11 | CQL spec 3.4.6 | Native protocol v5]
+
+-----------------------------------------------------------------------------------------------------------------------
+
+
+To see databases (or) keyspaces --- DESCRIBE KEYSPACES;
+
+To select database --- use chatcore_chat;
+
+To view current keyspace tables --- DESCRIBE TABLES;
+
+To view table scheme and table values  -- DESC TABLE table_sequence;
+
+To get tables info -- SELECT * FROM system_schema.tables WHERE keyspace_name = 'chatcore_chat';
+
+To view or get particular table info -- SELECT * FROM system_schema.columns
+                 ... WHERE keyspace_name = 'chatcore_chat' AND table_name = 'table_sequence';
+
+

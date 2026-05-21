@@ -1,0 +1,15 @@
+ip addr - to know ip address for server
+
+nmcli device status - to view the network devices
+
+TO ASSIGN STATIC IP FOR WIFI
+
+nmcli con mod ezeeinfo  ipv4.addresses 172.16.200.163/24
+nmcli con mod ezeeinfo  ipv4.gateway 172.16.200.1
+nmcli con mod ezeeinfo  ipv4.dns 8.8.8.8
+nmcli con mod ezeeinfo  ipv4.method manual
+
+down and up the wifi network
+
+nmcli con down ezeeinfo
+nmcli con up ezeeinfo

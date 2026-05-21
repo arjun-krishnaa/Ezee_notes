@@ -1,0 +1,379 @@
+import groovy.json.JsonSlurperClassic
+
+pipeline {
+    agent any
+
+    options {
+        timestamps()
+    }
+
+    parameters {
+        booleanParam(name: 'EZEEFLEET_MANUAL_BUILD',  defaultValue: false, description: 'Trigger manual build')
+        booleanParam(name: 'EZEEFLEET_MANUAL_DEPLOY', defaultValue: false, description: 'Trigger manual deploy only')
+    }
+
+    environment {
+        TOOLS_DIR  = "${WORKSPACE}/tools"
+
+        JAVA_HOME  = "${TOOLS_DIR}/jdk-25"
+        MAVEN_HOME = "${TOOLS_DIR}/maven-4"
+        MAVEN_CMD  = "${MAVEN_HOME}/bin/mvn"
+        PATH       = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${env.PATH}"
+
+        MAVEN_REPO     = "/usr/app/maven/repository"
+        S3_BUCKET      = 'ezin-jenkins-cicd/efleet'
+        AWS_REGION     = 'ap-south-1'
+        S3_SERVER_FILE = "server/servers.json"
+    }
+
+    stages {
+
+        /* ------------------------------------------------------------
+           Ensure Java 25 & Maven 4
+        ------------------------------------------------------------- */
+        stage('Ensure Java 25 & Maven 4') {
+            when {
+                expression {
+                    !params.EZEEFLEET_MANUAL_DEPLOY
+                }
+            }
+            steps {
+                sh '''
+                  set -e
+                  mkdir -p "$TOOLS_DIR"
+
+                  ARCH=$(uname -m)
+                  echo "Detected architecture: $ARCH"
+
+                  if [ "$ARCH" = "aarch64" ]; then
+                    JDK_URL="https://corretto.aws/downloads/latest/amazon-corretto-25-aarch64-linux-jdk.tar.gz"
+                  else
+                    JDK_URL="https://corretto.aws/downloads/latest/amazon-corretto-25-x64-linux-jdk.tar.gz"
+                  fi
+
+                  # ---- Java 25 ----
+                  if [ -x "$JAVA_HOME/bin/java" ]; then
+                    if "$JAVA_HOME/bin/java" -version >/dev/null 2>&1; then
+                      echo "Java 25 already valid"
+                    else
+                      rm -rf "$JAVA_HOME"
+                    fi
+                  fi
+
+                  if [ ! -d "$JAVA_HOME" ]; then
+                    curl -L -o /tmp/jdk25.tar.gz "$JDK_URL"
+                    tar -xzf /tmp/jdk25.tar.gz -C "$TOOLS_DIR"
+                    mv "$TOOLS_DIR"/amazon-corretto-25* "$JAVA_HOME"
+                  fi
+
+                  # ---- Maven 4 ----
+                  if [ ! -d "$MAVEN_HOME" ]; then
+                    curl -L -o /tmp/maven4.tar.gz \
+                      https://dlcdn.apache.org/maven/maven-4/4.0.0-rc-5/binaries/apache-maven-4.0.0-rc-5-bin.tar.gz
+                    tar -xzf /tmp/maven4.tar.gz -C "$TOOLS_DIR"
+                    mv "$TOOLS_DIR"/apache-maven-4.0.0-rc-5 "$MAVEN_HOME"
+                  fi
+
+                  "$JAVA_HOME/bin/java" -version
+                  "$MAVEN_CMD" -version
+                '''
+            }
+        }
+
+        /* ------------------------------------------------------------
+           Prepare Environment
+        ------------------------------------------------------------- */
+        stage('Prepare Environment') {
+            steps {
+                script {
+
+                    // Guardrail: invalid param combination
+                    if (params.EZEEFLEET_MANUAL_BUILD && params.EZEEFLEET_MANUAL_DEPLOY) {
+                        error("Invalid input: Select either Manual Build OR Manual Deploy, not both")
+                    }
+
+                    env.BRANCH_LOWER   = (env.BRANCH_NAME ?: 'unknown').toLowerCase()
+                    env.SAFE_BRANCH    = (env.BRANCH_NAME ?: 'unknown').replaceAll(/[^a-zA-Z0-9]/, '-')
+                    env.dateTag        = new Date().format('yyyyMMdd', TimeZone.getTimeZone('Asia/Kolkata'))
+                    env.versionStr     = "fleetservices-${env.SAFE_BRANCH}-${env.dateTag}_${env.BUILD_NUMBER}"
+                    env.IS_RELEASE     = (env.BRANCH_LOWER == 'release').toString()
+                    env.JENKINS_ACCOUNT_ID = "995202495874"
+                    env.PROD_FILEPATH  = "prod"
+                    env.NONPROD_FILEPATH = "non-prod"
+                    env.TRIGGERED_BY   = getTriggeredUser()
+
+                    sh """
+                        mkdir -p "${WORKSPACE}/tmp"
+                        aws s3 cp "s3://${S3_BUCKET}/${S3_SERVER_FILE}" "${WORKSPACE}/tmp/servers.json"
+                    """
+
+                    if (!fileExists("${WORKSPACE}/tmp/servers.json")) {
+                        error("servers.json download failed")
+                    }
+                }
+            }
+        }
+
+        /* ------------------------------------------------------------
+           Build & Upload
+        ------------------------------------------------------------- */
+        stage('Build & Upload to S3') {
+            when {
+                expression {
+                    return params.EZEEFLEET_MANUAL_BUILD || !params.EZEEFLEET_MANUAL_DEPLOY
+                }
+            }
+            steps {
+                dir('fleetservices') {
+                    sh """
+                        mkdir -p src/main/webapp
+                        echo "Version: ${env.versionStr}" > src/main/webapp/version.txt
+                        echo "Branch: ${env.BRANCH_NAME}" >> src/main/webapp/version.txt
+                        echo "Build: ${env.BUILD_NUMBER}" >> src/main/webapp/version.txt
+                    """
+
+                    sh """
+                        ${MAVEN_CMD} clean install \
+                        -Dmaven.repo.local=${MAVEN_REPO} \
+                        -Dbuild.version=${env.versionStr} \
+                        -Dbuild.time=${env.dateTag} \
+                        -Dbuild.branch=${env.BRANCH_NAME} \
+                        -Dbuild.number=${env.BUILD_NUMBER}
+                    """
+                }
+
+                script {
+                    def s3Folder = env.IS_RELEASE.toBoolean()
+                        ? "${env.PROD_FILEPATH}/${env.SAFE_BRANCH}"
+                        : "${env.NONPROD_FILEPATH}/${env.SAFE_BRANCH}"
+
+                    sh """
+                        WAR_FILE=\$(find fleetservices -type f -name "fleetservices.war" | head -n 1)
+
+                        if [ -z "\$WAR_FILE" ]; then
+                            echo "ERROR: WAR file not found"
+                            exit 1
+                        fi
+
+                        echo "Uploading WAR: \$WAR_FILE"
+                        aws s3 cp "\$WAR_FILE" \
+                        s3://${S3_BUCKET}/${s3Folder}/${env.versionStr}.war
+                    """
+
+                    if (env.IS_RELEASE.toBoolean()) {
+                        sh """
+                            aws s3 cp "\$WAR_FILE" \
+                            s3://${S3_BUCKET}/${s3Folder}/fleetservices-latest.war
+                        """
+                    }
+                }
+            }
+        }
+
+
+        /* ------------------------------------------------------------
+           Manual Deploy (Deploy-only)
+        ------------------------------------------------------------- */
+        stage('Manual Deploy') {
+            when { expression { return params.EZEEFLEET_MANUAL_DEPLOY } }
+            steps {
+                script {
+                    def server = selectServer()
+                    def version = selectVersion()
+                    deployToInstance("s3://${S3_BUCKET}/${version}", server)
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline finished for ${env.BRANCH_NAME}"
+            echo "Cleaning up pipeline-installed tools"
+            sh 'rm -rf "${WORKSPACE}/tools"'
+        }
+        success {
+            sendTeamsNotification("SUCCESS")
+        }
+        failure {
+            sendTeamsNotification("FAILED")
+        }
+        aborted {
+            sendTeamsNotification("ABORTED")
+        }
+    }
+}
+
+// ----------------  functions ----------------
+def deployToInstance(String s3Path, def selectedServer) {
+    script {
+
+        echo "Deploying ${s3Path} → Account=${selectedServer.accountId}, Instance=${selectedServer.instanceId}, Region=${selectedServer.region}"
+
+        // --- Function that actually runs the SSM command ---
+        def runSsm = { server ->
+            def commandId = sh(
+                script: """
+                    aws ssm send-command \
+                        --document-name "AWS-RunShellScript" \
+                        --targets "Key=InstanceIds,Values=${server.instanceId}" \
+                        --region "${server.region}" \
+                        --comment "Deploy WAR to Tomcat" \
+                        --parameters '{"commands":["sudo /usr/jenkins/fleet-deploy.sh \\"${s3Path}\\""]}' \
+                        --query "Command.CommandId" \
+                        --output text
+                """,
+                returnStdout: true
+            ).trim()
+
+            echo "SSM CommandId: ${commandId}"
+
+            sh """
+                aws ssm wait command-executed \
+                    --command-id ${commandId} \
+                    --instance-id ${server.instanceId} \
+                    --region "${server.region}"
+            """
+
+            def output = sh(
+                script: """
+                    aws ssm get-command-invocation \
+                        --command-id ${commandId} \
+                        --instance-id ${server.instanceId} \
+                        --region "${server.region}" \
+                        --query 'StandardOutputContent' \
+                        --output text
+                """,
+                returnStdout: true
+            ).trim()
+
+            echo "SSM OUTPUT:\n${output}"
+        }
+
+        // --- SAME ACCOUNT → no assume role ---
+        if (selectedServer.accountId == env.JENKINS_ACCOUNT_ID) {
+            echo "Same AWS account → using Jenkins EC2 IAM role"
+            runSsm(selectedServer)
+            return
+        }
+
+        // --- CROSS ACCOUNT → assume role ---
+        echo "Cross-account → assuming role: ${selectedServer.role}"
+
+        withAWS(
+            role: "arn:aws:iam::${selectedServer.accountId}:role/${selectedServer.role}",
+            roleSessionName: "JenkinsDeploySession",
+            region: selectedServer.region
+        ) {
+            runSsm(selectedServer)
+        }
+    }
+}
+
+def selectServer() {
+    def jsonFile = "${env.WORKSPACE}/tmp/servers.json"
+    if (!fileExists(jsonFile)) {
+        error("Servers JSON not found at ${jsonFile}. Ensure earlier stage downloaded it.")
+    }
+
+    def jsonText = readFile(jsonFile)
+    def json = new JsonSlurperClassic().parseText(jsonText)
+
+    // Manual-only: pick from staging
+    def serversList = json.staging ?: []
+    if (serversList.isEmpty()) {
+        error("No servers available under 'staging' in servers.json")
+    }
+
+    def serverNames = serversList.collect { it.name }
+
+    def selectedServerName = input(
+        id: 'ServerSelect',
+        message: 'Select target server:',
+        parameters: [
+            choice(
+                name: 'TARGET_SERVER',
+                choices: serverNames.join('\n'),
+                description: 'EC2 Instance'
+            )
+        ]
+    )
+
+    def selectedServer = serversList.find { it.name == selectedServerName }
+    if (!selectedServer) {
+        error("Selected server ${selectedServerName} not found in server list")
+    }
+
+    return selectedServer
+}
+
+def selectVersion(maxVersions = 15) {
+    script {
+        def s3Cmd = env.IS_RELEASE.toBoolean() ?
+            "aws s3 ls s3://${S3_BUCKET}/${env.PROD_FILEPATH}/${env.SAFE_BRANCH} --region ${AWS_REGION} --recursive" :
+            """
+            (
+                aws s3 ls s3://${S3_BUCKET}/${env.NONPROD_FILEPATH}/${env.SAFE_BRANCH} --region ${AWS_REGION} --recursive | tail -n 10
+                aws s3 ls s3://${S3_BUCKET}/${env.PROD_FILEPATH}/release --region ${AWS_REGION} --recursive | tail -n 5
+            )
+            """
+
+        echo "DEBUG: S3 command -> ${s3Cmd}"
+
+        def versionList = sh(
+            script: """
+                (${s3Cmd}) |
+                grep -E 'fleetservices.*\\.war\$' |
+                sort -k1,1 -k2,2 |
+                tac |
+                awk '{print \$4}' |
+                head -n ${maxVersions}
+            """,
+            returnStdout: true
+        ).trim().readLines()
+
+        echo "Available WAR files:\n${versionList.join('\n')}"
+
+        if (!versionList || versionList.isEmpty()) {
+            error("No WAR versions found in S3 bucket for branch ${env.BRANCH_NAME}")
+        }
+
+        def deployVersion = input(
+            id: 'VersionSelect',
+            message: 'Select WAR version to deploy:',
+            parameters: [
+                choice(
+                    name: 'SELECTED_VERSION',
+                    choices: versionList.join("\n"),
+                    description: 'Select WAR file'
+                )
+            ]
+        )
+
+        // return path after bucket name
+        return deployVersion.tokenize('/')[1..-1].join('/')
+    }
+}
+// 🧩 Helper: detect who or what triggered the build
+def getTriggeredUser() {
+    try {
+        wrap([$class: 'BuildUser']) {
+            return BUILD_USER ?: 'AUTO'
+        }
+    } catch (err) {
+        return 'AUTO'
+    }
+}
+
+def sendTeamsNotification(String status) {
+    withCredentials([string(credentialsId: 'POWER_AUTOMATE_URL', variable: 'WEBHOOK')]) {
+        writeFile file: 'payload.json', text: groovy.json.JsonOutput.toJson([
+            project_name : env.JOB_NAME,
+            build_status : status,
+            build_number : env.BUILD_NUMBER,
+            triggered_by : env.TRIGGERED_BY ?: "AUTO"
+        ])
+
+        sh 'curl -s -X POST -H "Content-Type: application/json" -d @payload.json "$WEBHOOK"'
+    }
+}

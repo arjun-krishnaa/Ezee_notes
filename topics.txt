@@ -1,0 +1,77 @@
+Lenovo -PC0N0CZN
+
+Lenovo Thinkpad T460s
+
+------------------------------------------------------------------------
+
+white listed
+
+global include
+
+letencrypt
+
+database connection 
+ 
+tomcat - reddis- database connection
+
+PHP - reddis - nginx
+
+bin files permission
+
+conf files permission
+
+
+Get-WmiObject win32_bios | Select-Object SerialNumber
+
+Get-CimInstance Win32_BIOS | Select SerialNumber
+
+PF4XJ670
+
+
+--><Resource name="jdbc/dev_data"
+          auth="Container"
+          type="javax.sql.DataSource"
+          maxTotal="100"
+          maxIdle="30"
+          maxWaitMillis="10000"
+          username="admin"
+          password="qwerty123"
+          driverClassName="com.mysql.cj.jdbc.Driver"
+          url="jdbc:mysql://database-1.c5kym44iombm.ap-south-1.rds.amazonaws.com:3306/dev_data?
+          useSSL=true
+          &requireSSL=true
+          &verifyServerCertificate=true
+          &trustCertificateKeyStoreUrl=file:/certs/global-bundle.pem"/>
+
+57.12-service
+30.11-web
+80-rds
+20 - vpc
+
+
+Payable ID - 878436877216 - $316.86
+Payable ID - 868644649537 - $130.63
+TOTAL 				     -  $447.29
+Vinayaga Travels
+ 
+80  -database
+57.12 - service
+30.11  -web
+20 -vpc
+
+80+57.12+30.11+20 =187.23  USD
+
+
+
+
+
+x*5kGcxu
+
+
+
+Email Address: service@sdelmec.com
+Password :   9mrmOo#r
+
+Email Address: info@sdelmec.com
+Password :   x*5kGcxu
+

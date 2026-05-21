@@ -1,0 +1,70 @@
+To view Store Procedure - SHOW CREATE PROCEDURE EZEE_SP_SCHEDULE_STAGE_IUD;
+To Delete table  - DROP PROCEDURE EZEE_SP_SCHEDULE_STAGE_IUD;
+To view all Store Procedure  -  SHOW PROCEDURE STATUS WHERE Db = 'bits_dev_stage';
+
+to view table constraints -- SHOW CREATE TABLE ticket_tax_invoice;
+
+--------------------------------------------------------------------------------
+CREATE USERNAME AND GIVE GRANT privilege
+
+Login as a admin user(default user)
+
+CREATE USER 'stagedevmodapp8'@'%' IDENTIFIED BY 'reQK9pt31kCLtf5';  - to create user
+
+GRANT ALL PRIVILEGES ON bits_dev_stage.* TO 'stagedevmodapp8'@'%';  - to give access to user
+
+REVOKE ALL PRIVILEGES ON bits_dev_stage.* FROM 'stagedevmodapp8'@'%';  - to remove access from user
+
+mysql -ustagedevmodapp8 -preQK9pt31kCLtf5 -hdev-ezee-stage.cd0gw6k66dss.ap-south-2.rds.amazonaws.com  - login crendials
+
+mysql -ustagedevmodapp8 -preQK9pt31kCLtf5 -hdev-ezee-stage.cd0gw6k66dss.ap-south-2.rds.amazonaws.com mod_app_stage 
+
+IF PASSWORD NOT STATISFIED BY MySQL
+
+SHOW VARIABLES LIKE 'validate_password%'; -- to view password variables
+
+SELECT VALIDATE_PASSWORD_STRENGTH('weak'); -- if run this query output will be like this to change password strength
++------------------------------------+
+| VALIDATE_PASSWORD_STRENGTH('weak') |
++------------------------------------+
+|                                 25 |
++------------------------------------+
+
+TO CHANGE PASSWORD POLICY AND LOWER THE VALIDATION RULE
+
+SET GLOBAL validate_password.length = 6;
+SET GLOBAL validate_password.number_count = 0;
+
+if you have DETERMINISTIC, NO SQL, or READS SQL DATA (or) ess safe log_bin_trust_function_creators variable
+(while importing store procedure as root user or any other user)
+
+SET GLOBAL log_bin_trust_function_creators = 1;
+
+-----------------------------------------------------------------------------
+other querries
+
+SELECT 
+    CONSTRAINT_NAME, 
+    CONSTRAINT_TYPE, 
+    TABLE_NAME 
+FROM 
+    INFORMATION_SCHEMA.TABLE_CONSTRAINTS 
+WHERE 
+    TABLE_NAME = 'ticket_tax_invoice';
+
+SELECT 
+    CONSTRAINT_NAME, 
+    TABLE_NAME, 
+    CONSTRAINT_TYPE 
+FROM 
+    INFORMATION_SCHEMA.TABLE_CONSTRAINTS 
+WHERE 
+    TABLE_NAME = 'ticket_tax_invoice' 
+    AND TABLE_SCHEMA = 'bits_dev_stage';
+
+SELECT CONSTRAINT_NAME, CONSTRAINT_TYPE, TABLE_NAME
+FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+WHERE TABLE_NAME = 'ticket_tax_invoice';
+
+
+DROP DATABASE dev_data_fleet;

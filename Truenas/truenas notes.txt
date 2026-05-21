@@ -1,0 +1,68 @@
+TRUENAS
+-------------
+
+Version: Truenas Scale
+Advantage of this version:
+	TrueNAS SCALE (Linux-based) offers better hardware compatibility, superior application support (Docker/Kubernetes), and active development.
+	1. Operating System:  SCALE uses Debian Linux, offering wider driver support for new hardware.
+	2. Applications:  SCALE runs Docker/KVM, making it far better for containerization and VMs
+	3. Performance:  SCALE updates have brought them to near parity, often exceeding CORE in certain scenarios.
+
+------------------------------------------------------------------------------
+browser access link : https://truenas-dev.ezeebits.in:8443/ui/dashboard
+
+Specifications
+1. Dashboard
+2. Storage
+3. Datasets
+4. Shares
+5. Data Protection
+6. Network
+7. Credentials
+8. Container
+9. Virtual Machines
+10. Apps
+11. Reporting
+12. System
+
+-----------------------------------------------------------------------------
+installation guide
+
+TrueNAS (CORE or SCALE) requires a 64-bit x86_64 CPU, at least 8GB of RAM (16GB+ recommended), a dedicated 16GB+ SSD for the boot drive, and separate drives for data storage. You will also need a USB stick for the installer, an Ethernet connection, and a compatible motherboard without RAID controllers interfering with ZFS.
+
+Hardware & Software Prerequisites
+
+Processor: 64-bit Intel or AMD CPU (dual-core minimum, 4-6+ cores recommended).
+Memory (RAM): 8GB minimum (ECC RAM is strongly preferred for data integrity).
+Boot Drive: A dedicated SSD/HDD (16GB minimum, 32GB+ recommended). USB sticks are not recommended for long-term boot use due to high write endurance needs.
+Storage Drives: One or more SATA/SAS drives for data. For redundancy, at least two identical drives are recommended (e.g., ZFS Mirror). Avoid SMR (Shingled Magnetic Recording) drives.
+Installation Media: A USB stick for the TrueNAS ISO and a tool like BalenaEtcher.
+Networking: Wired Ethernet (Gigabit or faster). Wireless is not supported.
+BIOS/UEFI: SATA controllers should be in AHCI or IT mode (JBOD), not hardware RAID mode.
+
+------------------------------------------------------------------------------------
+
+Installation Steps
+
+Download the ISO image from the TrueNAS website.
+Use BalenaEtcher to flash the ISO to a USB stick.
+Connect the USB stick to the target machine and boot from it.
+Select "Install/Upgrade" and follow the installer prompts.
+Set a strong root password.
+Reboot and access the management interface via web browser. 
+
+-------------------------------------------------------------------------------------------
+
+User
+------
+Useradd --->
+
+
+
+
+
+
+
+
+
+ 

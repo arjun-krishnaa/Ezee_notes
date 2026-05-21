@@ -1,0 +1,183 @@
+This error is a **data/schema issue**, not a MySQL bug. The message tells you exactly what’s wrong:
+
+---
+
+# ❌ Error
+
+```
+ERROR 6125 (HY000):
+Failed to add the foreign key constraint.
+Missing unique key for constraint
+'fk_namespace_cancellation_policy_cancellation_policy_group1'
+in the referenced table 'cancellation_policy_group'
+```
+
+---
+
+# 🔍 Root Cause
+
+You’re trying to create a **foreign key** that references a column in:
+
+```
+cancellation_policy_group
+```
+
+👉 But that referenced column is **NOT indexed as PRIMARY KEY or UNIQUE**
+
+---
+
+# 🧠 Rule in MySQL
+
+A foreign key **must reference**:
+
+* ✅ PRIMARY KEY
+* ✅ or UNIQUE KEY
+
+❌ Cannot reference a normal column
+
+---
+
+# 🔧 Step-by-Step Fix
+
+## 1️⃣ Identify the failing FK line
+
+Open SQL around line 2685:
+
+```bash
+vi +2685 /home/ezee-admin/software/dev-bits-data-2026-01-06-20-06-39.sql
+```
+
+Look for something like:
+
+```sql
+CONSTRAINT fk_namespace_cancellation_policy_cancellation_policy_group1
+FOREIGN KEY (group_id)
+REFERENCES cancellation_policy_group (id)
+```
+
+---
+
+## 2️⃣ Check referenced table structure
+
+Login to MySQL:
+
+```bash
+mysql -u root -p
+```
+
+Run:
+
+```sql
+USE bits_dev_stage;
+
+SHOW CREATE TABLE cancellation_policy_group;
+```
+
+---
+
+## 3️⃣ Check the referenced column
+
+Look for the column used in FK (example: `id`, `group_id`, etc.)
+
+👉 If it does NOT have:
+
+* `PRIMARY KEY`
+* or `UNIQUE`
+
+That’s your issue.
+
+---
+
+## 4️⃣ Fix Option A (Best) – Add UNIQUE/PK
+
+If the column **should be unique**, run:
+
+```sql
+ALTER TABLE cancellation_policy_group
+ADD UNIQUE (id);
+```
+
+OR if it should be primary:
+
+```sql
+ALTER TABLE cancellation_policy_group
+ADD PRIMARY KEY (id);
+```
+
+---
+
+## 5️⃣ Fix Option B – Modify dump file
+
+Edit the `.sql` file and:
+
+### Either:
+
+* Add unique key before FK:
+
+```sql
+ALTER TABLE cancellation_policy_group
+ADD UNIQUE KEY (id);
+```
+
+### Or temporarily remove FK:
+
+```sql
+-- remove or comment this
+CONSTRAINT fk_namespace_cancellation_policy_cancellation_policy_group1 ...
+```
+
+---
+
+## 6️⃣ Quick workaround (if you just want import to succeed)
+
+⚠️ Not ideal for production but useful temporarily:
+
+```sql
+SET FOREIGN_KEY_CHECKS=0;
+```
+
+Add at top of SQL file:
+
+```bash
+vi /home/ezee-admin/software/dev-bits-data-2026-01-06-20-06-39.sql
+```
+
+Add:
+
+```sql
+SET FOREIGN_KEY_CHECKS=0;
+```
+
+Then import again.
+
+---
+
+# ⚠️ Important Notes
+
+* Disabling FK checks **does NOT fix schema**
+* It just skips validation → may lead to inconsistent data
+
+---
+
+# 💡 Best Practice
+
+✔ Ensure **referenced columns are indexed properly**
+✔ Keep FK + PK relationships consistent in dump
+
+---
+
+# 🚀 Recommended Fix Strategy
+
+1. Check `SHOW CREATE TABLE cancellation_policy_group`
+2. Add **UNIQUE or PRIMARY KEY**
+3. Re-run import
+
+---
+
+If you paste:
+
+```sql
+SHOW CREATE TABLE cancellation_policy_group;
+```
+
+I’ll give you the **exact ALTER statement** for your case.

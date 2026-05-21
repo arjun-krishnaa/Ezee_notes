@@ -1,0 +1,3 @@
+To see storge metrics - curl -k -u elastic:X0Ez_AbjP81x0fJZCvkl   "https://kibana-dev.ezeebits.in:9200/_cat/indices?v&s=store.size:desc"
+
+To delete metrics storge -  curl -k -u elastic:X0Ez_AbjP81x0fJZCvkl   "https://kibana-dev.ezeebits.in:9200/_cat/indices?v&s=store.size:desc"

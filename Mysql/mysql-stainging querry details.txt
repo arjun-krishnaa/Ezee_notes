@@ -1,0 +1,42 @@
+
+
+CREATE USER 'stagedevcargo8'@'%' IDENTIFIED BY 'reQK9pt31kCLtf5';
+
+GRANT ALL PRIVILEGES ON cargo_dev_data.* TO 'stagedevcargo8'@'%';
+
+
+CREATE USER 'stagedev8'@'%' IDENTIFIED BY 'reQK9pt31kCLtf5';
+
+GRANT ALL PRIVILEGES ON bits_dev_stage.* TO 'stagedev8'@'%';
+
+
+mysql -h bits-cargo.cd0gw6k66dss.ap-south-2.rds.amazonaws.com -P 3306 -u admin -pJqUqPHAcZz0KRwDbTREs cargo_dev_data < /home/ec2-user/srm-cargo-data-2026-05-08-10-19-38.sql
+
+
+./rdsbitsbackup.sh: line 1: Started: command not found
+./rdsbitsbackup.sh: line 2: 2026-05-12-17-23-45: command not found
+./rdsbitsbackup.sh: line 3: mysqldump:: command not found
+./rdsbitsbackup.sh: line 6: syntax error near unexpected token `('
+./rdsbitsbackup.sh: line 6: `mysqldump: Got error: 2002: Can't connect to local MySQL server through socket '/var/lib/mysql/mysql.sock' (2) when trying to connect'
+
+
+NEW
+
+mysql -ustagedevcargo8 -preQK9pt31kCLtf5 -hbits-cargo.cd0gw6k66dss.ap-south-2.rds.amazonaws.com  cargo_dev_data
+
+mysql -ustagedev8 -preQK9pt31kCLtf5  -hbits-cargo.cd0gw6k66dss.ap-south-2.rds.amazonaws.com  bits_dev_stage
+
+
+OLD
+
+mysql -ustagedevcargo8 -preQK9pt31kCLtf5 -hdev-ezee-stage.cd0gw6k66dss.ap-south-2.rds.amazonaws.com
+
+mysql -ustagedev8 -preQK9pt31kCLtf5  -hdev-ezee-stage.cd0gw6k66dss.ap-south-2.rds.amazonaws.com
+
+
+SHOW PROCEDURE STATUS WHERE Db = 'bits_dev_stage';
+
+SHOW PROCEDURE STATUS WHERE Db = 'cargo_dev_data';
+
+------------------------------------------------------------------------------------------------------------------------
+Fleet staging DB admin password - EzeeTech@123

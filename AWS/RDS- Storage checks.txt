@@ -1,0 +1,27 @@
+RDS -Storage check  - 7th-May-2026
+
+EZEE-BITS
+Mumbai Region
+
+ezee-cargo-rds-prod   - Storage - 40 GB,  FreeStorageSpace ( Minimum ) - 11.34 GB
+orbit-rds-access-v2   - Storage - 20 GB,  FreeStorageSpace ( Minimum ) - 17.39 GB
+r1bits-rds-access-url - Storage - 60 GB,  FreeStorageSpace ( Minimum ) - 33.67 GB
+r2-bits-data-rds-v2   - Storage - 60 GB,  FreeStorageSpace ( Minimum ) - 29.85 GB
+
+Hyderabad Region
+
+r3-bits-data-rds-access - Storage - 60 GB,  FreeStorageSpace ( Minimum ) - 30.1 GB
+vinayaga-bits-data-rds  - Storage - 20 GB,  FreeStorageSpace ( Minimum ) - 17.07 GB
+
+EZEE-CLOUD
+Mumbai Region
+
+bits-wallet-access       - Storage - 20 GB,  FreeStorageSpace ( Minimum ) - 18.89 GB
+costiv-rds-edge          - Storage - 20 GB,  FreeStorageSpace ( Minimum ) - 17.91 GB
+geo-config-data-edge     - Storage - 20 GB,  FreeStorageSpace ( Minimum ) - 1.85 GB
+tourone-rds-mysql-access - Storage - 20 GB,  FreeStorageSpace ( Minimum ) - 134 MB 
+trackbus-vehicle-data    - Storage - 125 GB,  FreeStorageSpace ( Minimum ) - 10.3 MB
+
+Singapore Region
+
+orbit-ticket-data        - Storage - 20 GB,  FreeStorageSpace ( Minimum ) - 16.52 GB

@@ -1,0 +1,6 @@
+to view network adapter list -- netsh interface show interface
+
+to find serial number for laptop  -  Get-CimInstance win32_bios | Select SerialNumber
+
+to find network devices and ips and route  - ipconfig
+

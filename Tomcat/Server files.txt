@@ -1,0 +1,19 @@
+/usr/tomcat/dev-tomcat/conf
+
+Catalina                
+cache.properties     - Loopback Ip and Reddis connection port and max request no.
+config.properties    - AWS S3 config details and 
+email.properties     - SMTP usrname, passwd and port      
+jaspic-providers.xml - Java Authentication Service Provider Interface for Containers - Default configuration
+logging.properties   - Default configuration.
+sms.properties       - qikberry.props for wahats app and sms configuration.
+tomcat-users.xsd     - Default configuration.
+application.properties  - S3, datasink and zone server informations or configurations
+catalina.properties   - Default configuration removed package loader and common loader.
+context.xml           - Database configurations
+gatewayconfig.properties  - key location and return url, HDFC handshake URL, citrus, cca venue and techprocess.
+jaspic-providers.xsd   - Default configuration
+server.xml          -  Configure port number change from default port number
+tomcat-users.xml   - default configuration.
+web.xml             -  default configuration.
+

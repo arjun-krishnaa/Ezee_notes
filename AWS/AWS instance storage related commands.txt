@@ -1,0 +1,144 @@
+Storage increase steps and commands..
+
+Go to:
+
+Amazon EC2 Console
+Instances → Select your instance
+Storage tab
+Click the root Volume ID
+Actions → Modify Volume
+Increase from:
+20 GB → 40 GB (or required size)
+
+Wait until volume state becomes:
+
+optimizing
+or
+completed
+
+After this step
+To verify or view increase storage - lsblk
+
+Install growpart to increase storage - yum install -y cloud-utils-growpart
+
+To extend partition - growpart /dev/nvme0n1 1 
+
+To extend filesystem - df -Th
+
+if xfs run -- xfs_growfs -d /
+if EXT4  run -- resize2fs /dev/nvme0n1p1
+
+To verify --- df -h
+-------------------------------------------------------------------------------------------------------------------------
+
+To add extra storage volume
+
+Step 1: Create New Volume
+
+AWS Console:
+
+EC2 → Volumes
+Create Volume
+Same Availability Zone as EC2
+Example: 100 GB gp3
+Step 2: Attach Volume
+Select volume
+Actions → Attach Volume
+Select instance
+Device name:
+
+Example:
+
+/dev/xvdf
+
+After completing above steps
+
+To verify -- lsblk
+
+If XFS run -- mkfs.xfs /dev/xvdf
+If EXT4 run -- mkfs.ext4 /dev/xvdf
+
+To create mount point -- mkdir /data
+
+To mount created point -- mount /dev/xvdf /data
+
+To verify -- df -h
+
+For Permanent Mount 
+	- to get UUID -- blkid
+
+	- edit file - fstab
+
+	- add UUID in that file "UUID=xxxxx /data xfs defaults,nofail 0 2"
+
+	- to test use - mount -a
+
+To show disks - lsblk
+
+To show file system usage - df -h
+
+To show UUID - blkid
+
+To check file system type - df -Th
+
+-------------------------------------------------------------------------------------------------
+
+To add swap memory for an instance 
+
+To check existing swap -- swapon --show
+					  - df -h
+
+To create a swapfile for 2gb -- fallocate -l 2G /swapfile
+if fallocate fails run -- dd if=/dev/zero of=/swapfile bs=1M count=2048
+
+To set permission -- chmod 600 /swapfile
+To verify set permission - ls -lh /swapfile
+
+To create a swap area -- mkswap /swapfile
+
+To enable swapfile -- swapon /swapfile
+
+To check or verify existing swap -- swapon --show
+					  - df -h
+
+
+To make swapfile permanent after reboot 
+
+Change file from -- cp /etc/fstab /etc/fstab.bak
+
+add entry in that file -- echo '/swapfile none swap sw 0 0' >> /etc/fstab
+
+verify that file ---  cat /etc/fstab
+
+
+
+ To optimize swapness
+
+To check current swapness --  cat /proc/sys/vm/swappiness
+
+For temporary change - sysctl vm.swappiness=10
+For permanent change - echo 'vm.swappiness=10' >> /etc/sysctl.conf
+
+To apply changes -- sysctl -p
+
+
+
+To remove the swap file 
+
+Disable swapfile -- swapoff /swapfile
+
+remove 	fstab -- vi /etc/fstab  [remove this line -- /swapfile none swap sw 0 0]
+
+after delete swapfile -- rm -f /swapfile
+
+---------------------------------------------------------
+
+
+
+
+
+
+
+
+
+

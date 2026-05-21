@@ -1,0 +1,8 @@
+import groovy.json.JsonSlurperClassic
+
+The statement import groovy.json.JsonSlurperClassic is a Groovy import used to access the original implementation of the JSON parser in the Apache Groovy language.
+
+def 
+
+In Jenkins Pipelines, def is a Groovy keyword used to define a local variable or a function. Because Jenkins Pipelines are based on the Groovy DSL(Domain Specific Language), def allows you to create dynamic variables where the specific type is determined at runtime
+

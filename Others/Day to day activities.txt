@@ -1,0 +1,80 @@
+Vertex
+----------
+1. Task handling
+	1.Domain purchase
+	2. Invoice creation
+
+GoDaddy
+-------------
+1. Domain Purchasing
+2. Domain Pointing
+
+Jenkins
+---------
+1. SSL Configuration for domain
+2. CMS Portal Update
+
+Staging
+----------
+1. Placing war file 
+2. updating queries in database
+3. updating store procedure
+4. Clearing storage and memory whenever is full
+5. staging deployment
+
+ELK
+-----
+1. Monitoring server metrics
+2. create and managing dashboards 
+3. log management
+4. Alert monitoring - 15mins once
+5. API transaction, exception report
+
+Sitewatch
+--------------
+1. server monitoring
+
+Keka
+------
+1.Asset Management
+
+Enhancement
+-------------------
+1. ELK - logs dashboard
+
+Other
+--------
+1. MDM account creation
+2. Requirement basis
+3. Documentation and tracking
+
+
+
+
+ayanshbus.com
+kkbuss.in
+kkrtravels.com
+kktravelss.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	

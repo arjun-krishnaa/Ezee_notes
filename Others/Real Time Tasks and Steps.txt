@@ -1,0 +1,26 @@
+TASK 1: User Creation & Access Control (Real Production Scenario)
+
+### Scenario
+
+A new developer joins your team and needs limited access to the server.
+
+### Tasks
+
+1. Create a user `devuser`
+2. Set password and force password change on first login
+3. Add user to a group `developers`
+4. Allow SSH access but **no sudo access**
+5. Set account to expire after 30 days
+6. Verify login and permissions
+
+### Commands You’ll Use
+
+* `useradd`, `passwd`, `chage`
+* `groupadd`, `usermod`
+* `id`, `su`
+
+✅ **Expected Outcome:**
+User can log in via SSH but cannot install packages or access `/root`.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+

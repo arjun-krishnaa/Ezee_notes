@@ -1,0 +1,21 @@
+To delete overall cache - redis-cli FLUSHDB
+To delete particular cache - redis-cli DEL ACTION_CENTER_CACHE
+							redis-cli DEL cache:ACTION_CENTER_CACHE
+
+
+
+to find key is exit - redis-cli exists 2N33758S260427D
+to find key type - redis-cli type 2N33758S260427D
+
+to get data based on type
+| Type   | Command                                  |
+| ------ | ---------------------------------------- |
+| string | `get 2N33758S260427D`                    |
+| hash   | `hgetall 2N33758S260427D`                |
+| list   | `lrange 2N33758S260427D 0 -1`            |
+| set    | `smembers 2N33758S260427D`               |
+| zset   | `zrange 2N33758S260427D 0 -1 withscores` |
+
+-------------------------------------------------
+find key type - redis-cli type VEHICLE_MOVEMENT_REQUEST_CACHE:ezeefleet:trip001
+

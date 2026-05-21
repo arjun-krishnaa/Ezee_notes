@@ -1,0 +1,135 @@
+Storage - 2 disks [created]
+
+dataset [DS]
+----------
+partition1[disk]
+	-application[DS] [created] [non SMB shares]
+	-level1 [DS] [created] [SMB shares]
+		-sublevel1
+		-sublevel2
+shares
+---------
+-partition1/level1[SMB shares]
+	-sublevel1
+	--sublevel2
+
+data protection
+---------------------
+Configured - SMART TEST (Self-Monitoring, Analysis, and Reporting Technology) - Long term - All disk
+
+users
+-------
+-------------------------------
+Username : root
+UID: 0
+Builtin :  Yes
+Full name : root
+Roles : Full Admin
+API Keys:No keys
+GID:0
+Home Directory:/root
+Shell:/usr/bin/zsh
+Email:–
+Password Disabled:Yes
+Lock User:No
+Samba Authentication:No
+SSH:Key not set
+Password History:No History
+Password Age:–
+Last Password Change:–
+Password Change Required:No
+
+-------------------------------------
+Username : truenas_admin
+UID: 950
+Builtin :  no
+Full name : Local Administrator
+Roles : Full Admin
+API Keys:No keys
+GID:950
+Home Directory:/home/truenas_admin
+Shell:/usr/bin/zsh
+Email:–
+Password Disabled:No
+Lock User:No
+Samba Authentication:No
+SSH:Key not set
+Password History:No History
+Password Age:12 days
+Last Password Change:2026-04-17 12:35:45
+Password Change Required:No
+Allowed Sudo Commands:ALL
+
+----------------------------------
+Username : user1
+UID: 3000
+Builtin :  no
+Full name : user1
+Roles : N/A
+API Keys:No keys
+GID:3001
+Home Directory:/mnt/partition1/level1/sublevel2
+Shell:/usr/sbin/nologin
+Email:–
+Password Disabled:No
+Lock User:No
+Samba Authentication:Yes
+SSH:Key not set
+Password History:No History
+Password Age:12 days
+Last Password Change:2026-04-17 13:15:25
+Password Change Required:No
+
+------------------------------------
+Username : user2
+UID: 3003
+Builtin :  no
+Full name : user2
+Roles : Full Admin
+API Keys:No keys
+GID:3003
+Home Directory:/var/empty
+Shell:/usr/sbin/nologin
+Email:–
+Password Disabled:No
+Lock User:No
+Samba Authentication:Yes
+SSH:Key not set
+Password History:No History
+Password Age:11 days
+Last Password Change:2026-04-17 18:47:04
+Password Change Required:No
+---------------------------------------------
+groups
+----------
+group:  truenas_admin
+GID: 950
+Builtin :  no
+Allows sudo commands : no
+Samba Authentication : no
+Roles : N/A
+
+---------------------------------
+group:  user1
+GID: 3001
+Builtin :  no
+Allows sudo commands : no
+Samba Authentication : no
+Roles : N/A
+---------------------------------
+group:  level1
+GID: 3000
+Builtin :  no
+Allows sudo commands : yes
+Samba Authentication : yes
+Roles : N/A
+--------------------------------
+group:  level2
+GID: 3002
+Builtin :  no
+Allows sudo commands : no
+Samba Authentication : yes
+Roles : Full Admin
+-----------------------------------
+
+

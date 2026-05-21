@@ -1,0 +1,8 @@
+ACTIVE FLAG STATUS:
+
+0: Inactive / Deleted
+1: Active / Current
+2: Pending / Under Review
+3: Suspended / Locked
+4: Archived, Completed, or a Special Restricted Status (common in ERP or CRM systems).
+-----------------------------------------------------------

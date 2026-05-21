@@ -1,0 +1,7 @@
+if git hub branch token were expired. navigate to that particular directory and the branch. we can update the git hub token via CLI 
+
+git remote set-url origin https://imthiyas63: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@github.com/JavakarBits/efleet.git
+
+and also it affects the jenkins pipeline.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------

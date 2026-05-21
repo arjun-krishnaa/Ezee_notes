@@ -1,0 +1,445 @@
+To untar tomcat-11.0.10.tar in Linux, use this command:
+
+tar -xvf tomcat-11.0.10.tar
+Explanation
+
+tar → archive tool
+
+-x → extract
+
+-v → verbose (shows files being extracted)
+
+-f → file name
+
+If it is compressed (common cases)
+
+For .tar.gz or .tgz:
+
+tar -xzvf tomcat-11.0.10.tar.gz
+
+For .tar.bz2:
+
+tar -xjvf tomcat-11.0.10.tar.bz2
+Extract to a specific directory
+tar -xvf tomcat-11.0.10.tar -C /opt/
+
+If you want, I can also show full steps to install Apache Tomcat from the tar file on Linux (5-minute setup). 🚀
+
+Srm Bits RDS Backup Started
+2026-03-13-18-47-54
+mysqldump: [Warning] Using a password on the command line interface can be insecure.
+mysqldump: Got error: 2005: Unknown MySQL server host 'dev-ezee-stage.cdmccas3sqxo.ap-south-1.rds.amazonaws.com' (-2) when trying to connect
+mysqldump: [Warning] Using a password on the command line interface can be insecure.
+mysqldump: Got error: 2005: Unknown MySQL server host 'dev-ezee-stage.cdmccas3sqxo.ap-south-1.rds.amazonaws.com' (-2) when trying to connect
+2026-03-13-18-47-54
+copping to S3
+
+The config profile (srm-s3-usr) could not be found
+
+The config profile (srm-s3-usr) could not be found
+Coppied to S3
+Clean up old file
+2026-03-13-18-47-55
+Srm Bits RDS Backu Successfully completed
+
+Your backup script shows two main problems, even though it prints “Successfully completed”. The backup likely failed. Let’s break it down.
+
+1️⃣ MySQL Connection Error
+
+Error:
+
+mysqldump: Got error: 2005: Unknown MySQL server host 
+'dev-ezee-stage.cdmccas3sqxo.ap-south-1.rds.amazonaws.com'
+Possible Causes
+
+DNS cannot resolve the RDS hostname
+
+Wrong endpoint
+
+Network / VPC access issue
+
+Typo in hostname
+
+Check this first
+
+Run:
+
+ping dev-ezee-stage.cdmccas3sqxo.ap-south-1.rds.amazonaws.com
+
+or
+
+nslookup dev-ezee-stage.cdmccas3sqxo.ap-south-1.rds.amazonaws.com
+
+If it fails → hostname is wrong or DNS issue.
+
+Verify RDS endpoint in AWS
+
+Go to:
+
+AWS Console → RDS → Databases → your DB → Connectivity
+
+Example correct format:
+
+dev-ezee-stage.xxxxx.ap-south-1.rds.amazonaws.com
+2️⃣ AWS CLI Profile Error
+
+Error:
+
+The config profile (srm-s3-usr) could not be found
+
+Your script is trying to upload to S3 using AWS CLI profile srm-s3-usr, but it does not exist.
+
+Check profiles
+aws configure list-profiles
+
+If srm-s3-usr is missing → create it.
+
+Create profile
+aws configure --profile srm-s3-usr
+
+Enter:
+
+AWS Access Key
+AWS Secret Key
+Region (ap-south-1)
+Output format (json)
+3️⃣ Your Script Logic Issue
+
+Your script prints:
+
+Backup Successfully completed
+
+Even when mysqldump failed.
+
+You should add error checking:
+
+Example:
+
+if [ $? -ne 0 ]; then
+echo "Backup Failed"
+exit 1
+fi
+4️⃣ Password Warning (Not Critical)
+
+Warning:
+
+Using a password on the command line interface can be insecure
+
+Better method:
+
+Create file:
+
+~/.my.cnf
+
+Example:
+
+[client]
+user=dbuser
+password=dbpassword
+host=dev-ezee-stage.cdmccas3sqxo.ap-south-1.rds.amazonaws.com
+
+Then run:
+
+mysqldump dbname > backup.sql
+✅ Fix Checklist
+
+✔ Verify RDS hostname
+✔ Test DNS resolution
+✔ Configure AWS CLI profile srm-s3-usr
+✔ Improve backup script error handling
+
+✅ If you want, paste your backup shell script, I can fix it and make a production-ready version (with logging + S3 upload + failure alerts).
+
+remove store procedure command
+
+To remove (delete) a stored procedure in MySQL, use the DROP PROCEDURE command.
+
+Basic Syntax
+DROP PROCEDURE procedure_name;
+Example
+
+If your stored procedure name is getUserDetails:
+
+DROP PROCEDURE getUserDetails;
+Safer Command (recommended)
+
+This will not give an error if the procedure does not exist.
+
+DROP PROCEDURE IF EXISTS getUserDetails;
+Check existing stored procedures
+
+Before deleting, you can list them:
+
+SHOW PROCEDURE STATUS WHERE Db = 'your_database_name';
+
+or
+
+SHOW PROCEDURE STATUS;
+Drop procedure from specific database
+DROP PROCEDURE database_name.procedure_name;
+
+Example:
+
+DROP PROCEDURE mydb.getUserDetails;
+
+✅ If you want, I can also show:
+
+How to drop multiple stored procedures at once
+
+How to find procedures using a specific table before deleting them.
+
+see store prodecdure commands
+
+To see (view) stored procedures in MySQL, you can use these commands:
+
+1️⃣ List all stored procedures in a database
+SHOW PROCEDURE STATUS WHERE Db = 'database_name';
+
+Example:
+
+SHOW PROCEDURE STATUS WHERE Db = 'mydatabase';
+2️⃣ Show only procedure names
+SHOW PROCEDURE STATUS;
+3️⃣ View the code of a stored procedure
+SHOW CREATE PROCEDURE procedure_name;
+
+Example:
+
+SHOW CREATE PROCEDURE getUserDetails;
+
+This will display the full stored procedure definition.
+
+4️⃣ Using INFORMATION_SCHEMA (another method)
+SELECT ROUTINE_NAME
+FROM INFORMATION_SCHEMA.ROUTINES
+WHERE ROUTINE_TYPE = 'PROCEDURE'
+AND ROUTINE_SCHEMA = 'database_name';
+
+Example:
+
+SELECT ROUTINE_NAME
+FROM INFORMATION_SCHEMA.ROUTINES
+WHERE ROUTINE_TYPE = 'PROCEDURE'
+AND ROUTINE_SCHEMA = 'mydatabase';
+5️⃣ See procedures in current database
+SHOW PROCEDURE STATUS WHERE Db = DATABASE();
+
+✅ Quick summary
+
+Purpose	Command
+List procedures	SHOW PROCEDURE STATUS
+Procedures in DB	SHOW PROCEDURE STATUS WHERE Db='dbname'
+View procedure code	SHOW CREATE PROCEDURE procedure_name
+
+If you want, I can also show one command to export all stored procedures from MySQL (very useful for backups).
+
+SHOW PROCEDURE STATUS WHERE Db = dev_stage_data;
+
+Your command needs quotes around the database name.
+
+Correct syntax:
+
+SHOW PROCEDURE STATUS WHERE Db = 'dev_stage_data';
+What it shows
+
+This command will display:
+
+Db – Database name
+
+Name – Stored procedure name
+
+Type – PROCEDURE
+
+Definer – Who created it
+
+Created / Modified date
+
+Security type
+
+If you want only procedure names
+SELECT ROUTINE_NAME
+FROM INFORMATION_SCHEMA.ROUTINES
+WHERE ROUTINE_TYPE='PROCEDURE'
+AND ROUTINE_SCHEMA='dev_stage_data';
+To see the code of a specific procedure
+SHOW CREATE PROCEDURE dev_stage_data.procedure_name;
+
+If you want, I can also show a single command to drop all stored procedures in a database (sometimes needed in staging cleanup).
+
+DROP PROCEDURE EZEE_SP_SCHEDULE_STAGE_IUD;
+
+Your command is correct for deleting a stored procedure.
+
+Command
+DROP PROCEDURE EZEE_SP_SCHEDULE_STAGE_IUD;
+Recommended (Safe) Version
+
+Use IF EXISTS to avoid an error if the procedure is not present.
+
+DROP PROCEDURE IF EXISTS EZEE_SP_SCHEDULE_STAGE_IUD;
+If the procedure is in a specific database
+DROP PROCEDURE dev_stage_data.EZEE_SP_SCHEDULE_STAGE_IUD;
+Verify before deleting
+SHOW PROCEDURE STATUS WHERE Db = 'dev_stage_data';
+
+This helps confirm the procedure exists before dropping it.
+
+command to open store procedure
+
+To open / view a stored procedure in MySQL, use this command:
+
+View Stored Procedure Code
+SHOW CREATE PROCEDURE procedure_name;
+Example
+SHOW CREATE PROCEDURE EZEE_SP_SCHEDULE_STAGE_IUD;
+
+This will display the full stored procedure definition (CREATE PROCEDURE code).
+
+If the procedure is in a specific database
+SHOW CREATE PROCEDURE dev_stage_data.EZEE_SP_SCHEDULE_STAGE_IUD;
+Alternative method
+SELECT ROUTINE_DEFINITION
+FROM INFORMATION_SCHEMA.ROUTINES
+WHERE ROUTINE_NAME = 'EZEE_SP_SCHEDULE_STAGE_IUD'
+AND ROUTINE_SCHEMA = 'dev_stage_data';
+
+✅ Most commonly used command:
+
+SHOW CREATE PROCEDURE procedure_name;
+mysql> SET GLOBAL log_bin_trust_function_creators = 1;
+ERROR 1227 (42000): Access denied; you need (at least one of) the SUPER or SYSTEM_VARIABLES_ADMIN privilege(s) for this operation
+
+The error means your MySQL user does not have permission to change global variables.
+
+Error
+ERROR 1227 (42000): Access denied; you need (at least one of) the 
+SUPER or SYSTEM_VARIABLES_ADMIN privilege(s)
+Why this happens
+
+Only users with SUPER or SYSTEM_VARIABLES_ADMIN privileges can run:
+
+SET GLOBAL log_bin_trust_function_creators = 1;
+
+This commonly happens when:
+
+Using AWS RDS
+
+Logged in as a non-root MySQL user
+
+Binary logging is enabled
+
+✅ Solution 1 (For AWS RDS – Recommended)
+
+In AWS RDS, you cannot use SET GLOBAL.
+You must change it in the Parameter Group.
+
+Steps:
+
+Go to AWS Console
+
+Open RDS
+
+Click Parameter Groups
+
+Select the parameter group attached to your DB
+
+Search for:
+
+log_bin_trust_function_creators
+
+Change value to:
+
+1
+
+Save it.
+
+Sometimes reboot RDS instance is required.
+
+✅ Solution 2 (If you have root access in MySQL server)
+
+Login as root:
+
+mysql -u root -p
+
+Then run:
+
+SET GLOBAL log_bin_trust_function_creators = 1;
+✅ Check current value
+SHOW VARIABLES LIKE 'log_bin_trust_function_creators';
+⚠️ Why you needed this
+
+This error usually appears when creating stored functions or triggers.
+
+Example error:
+
+This function has none of DETERMINISTIC, NO SQL, or READS SQL DATA
+
+✅ If you want, I can also show how to fix this WITHOUT changing RDS parameter (safe workaround). This is useful if you don’t have AWS access.
+
+SET sql_mode=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''));
+SET GLOBAL log_bin_trust_function_creators = 1
+
+You are trying to run two MySQL commands. Here is the correct explanation and usage.
+
+1️⃣ Remove ONLY_FULL_GROUP_BY from SQL mode
+
+This command is correct and works for the current session:
+
+SET sql_mode = (SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''));
+Check current SQL mode
+SHOW VARIABLES LIKE 'sql_mode';
+
+⚠️ Note: This change is temporary (only for the current connection).
+
+2️⃣ Enable function creators
+
+Command:
+
+SET GLOBAL log_bin_trust_function_creators = 1;
+
+You received the error because:
+
+ERROR 1227: Access denied; you need SUPER or SYSTEM_VARIABLES_ADMIN
+If using AWS RDS
+
+You cannot run this command directly.
+
+Instead:
+
+Go to AWS Console
+
+Open RDS
+
+Click Parameter Groups
+
+Find parameter
+
+log_bin_trust_function_creators
+
+Set value to:
+
+1
+
+Save and reboot RDS instance if required.
+
+3️⃣ Temporary alternative (if you cannot change RDS parameter)
+
+When creating functions, add these options:
+
+CREATE FUNCTION my_function()
+RETURNS INT
+DETERMINISTIC
+READS SQL DATA
+BEGIN
+...
+END;
+
+This avoids the error without changing the server variable.
+
+✅ Quick summary
+
+Command	Purpose
+SET sql_mode...	Remove ONLY_FULL_GROUP_BY
+SET GLOBAL log_bin_trust_function_creators = 1	Allow function creation with binlog
+
+If you want, I can also show one command to permanently disable ONLY_FULL_GROUP_BY in MySQL / RDS, which is very useful for legacy queries.

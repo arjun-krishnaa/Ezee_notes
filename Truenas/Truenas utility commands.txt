@@ -1,0 +1,13 @@
+net use * /delete  -- to remove network storage ip
+
+created groups
+bits
+cargo
+Fleet
+devops
+production support
+customer support
+
+one user created for each group
+
+and folders also created for 

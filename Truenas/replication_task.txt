@@ -1,0 +1,8 @@
+REPLICATION TASK
+
+STEPS:
+1. Prepare destination truenas 
+2. Task snapshot of source truenas 
+3. Enable SSH services on both Nas
+4. From source nas create a replication Task
+5. Run that replication task periodically.

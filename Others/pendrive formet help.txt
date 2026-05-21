@@ -1,0 +1,9 @@
+diskpart
+select disk X
+clean
+create partition primary
+select partition 1
+format fs=exfat quick
+format fs=fat32 quick  --- if too big use above command
+assign
+exit

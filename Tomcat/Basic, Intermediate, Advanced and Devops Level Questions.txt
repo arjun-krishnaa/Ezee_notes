@@ -1,0 +1,101 @@
+LEVEL 1 — BEGINNER (BASIC UNDERSTANDING)
+
+Basic Questions
+
+What is Apache Tomcat?
+
+What is the difference between Web Server and Application Server?
+
+What is a WAR file?
+
+Default Tomcat port?
+
+What is CATALINA_HOME vs CATALINA_BASE?
+
+What is server.xml used for?
+
+What is web.xml?
+
+What is a Context in Tomcat?
+
+What is the purpose of conf/ folder?
+
+How to start and stop Tomcat?
+
+-------------------------------------------------------------------------------------------------------------------
+
+LEVEL 2 — INTERMEDIATE (REAL APPLICATION SETUP)
+
+Intermediate Questions
+
+What is a Connector in Tomcat?
+
+Difference between HTTP, AJP connector?
+
+What is JNDI?
+
+How Tomcat connects to MySQL/MariaDB?
+
+What is a DataSource?
+
+How class loading works in Tomcat?
+
+What is context.xml?
+
+What is session management in Tomcat?
+
+What is catalina.out?
+
+How to enable HTTPS in Tomcat?
+
+-------------------------------------------------------------------------------------------------------------------------
+
+LEVEL 3 — ADVANCED (PRODUCTION LEVEL)
+
+Advanced Questions
+
+What is thread pool in Tomcat?
+
+What is maxThreads?
+
+What is connectionTimeout?
+
+What is KeepAlive?
+
+What is memory leak in Tomcat?
+
+What are PermGen / Metaspace?
+
+How to tune Tomcat for high traffic?
+
+What is clustering in Tomcat?
+
+Sticky sessions vs non-sticky sessions?
+
+How to secure Tomcat in production?
+
+--------------------------------------------------------------------------------------------------------------------
+
+LEVEL 4 — DEVOPS / PRODUCTION EXPERT LEVEL
+
+ Expert Questions
+
+How Tomcat works behind Load Balancer?
+
+How to deploy multiple Tomcat instances?
+
+How to configure zero-downtime deployment?
+
+How to monitor Tomcat?
+
+What is JMX?
+
+How to integrate Prometheus with Tomcat?
+
+How to troubleshoot high CPU?
+
+How to troubleshoot full heap?
+
+How to analyze heap dump?
+
+How to scale Tomcat horizontally?

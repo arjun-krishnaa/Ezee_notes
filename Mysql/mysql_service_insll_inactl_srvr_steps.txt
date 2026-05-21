@@ -1,0 +1,101 @@
+Here's how to install MySQL 8.4 on Amazon Linux 2023.
+ 
+## Installation Steps
+ 
+Amazon Linux 2023 is based on Fedora/RHEL 9, so it uses the **EL9** MySQL repository. MySQL is not included in AL2023's default repos, so you need to add the official MySQL Yum repository first.
+ 
+### 1. Add the MySQL 8.4 Repository
+ 
+```bash
+sudo dnf install -y https://dev.mysql.com/get/mysql84-community-release-el9-1.noarch.rpm
+```
+ 
+Verify it was added:
+```bash
+sudo dnf repolist | grep mysql
+```
+ 
+You should see `mysql-8.4-lts-community` enabled by default.
+ 
+### 2. Import the GPG Key
+ 
+```bash
+sudo rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql
+```
+ 
+> **Note:** If you hit GPG key errors during install, try the 2023 key: `https://repo.mysql.com/RPM-GPG-KEY-mysql-2023`
+ 
+### 3. Install MySQL Server
+ 
+```bash
+sudo dnf install -y mysql-community-server
+```
+ 
+This installs the server plus required dependencies (client, common libs, etc.).
+ 
+### 4. Start and Enable MySQL
+ 
+```bash
+sudo systemctl enable --now mysqld
+sudo systemctl status mysqld
+```
+ 
+### 5. Secure the Installation
+ 
+Retrieve the temporary root password:
+```bash
+sudo grep 'temporary password' /var/log/mysqld.log
+```
+ 
+Run the security script:
+```bash
+sudo mysql_secure_installation
+```
+ 
+Paste the temporary password when prompted, then set a new strong password. MySQL 8.4's `validate_password` policy requires at least 8 characters with uppercase, lowercase, digit, and special character.
+ 
+### 6. Connect
+ 
+```bash
+mysql -u root -p
+```
+ 
+---
+ 
+## Key File Locations
+ 
+| File/Directory | Purpose |
+|---|---|
+| `/etc/my.cnf` | Main configuration |
+| `/var/lib/mysql/` | Data directory |
+| `/var/log/mysqld.log` | Error log (contains temp password) |
+ 
+---
+ 
+## If You Only Need the MySQL Client
+ 
+```bash
+sudo dnf install -y mysql-community-client
+```
+ 
+---
+ 
+## Quick Reference Script
+ 
+```bash
+#!/bin/bash
+sudo dnf install -y https://dev.mysql.com/get/mysql84-community-release-el9-1.noarch.rpm
+sudo rpm --import https://repo.mysql.com/RPM-GPG-KEY-mysql
+sudo dnf install -y mysql-community-server
+sudo systemctl enable --now mysqld
+echo "Temporary root password:"
+sudo grep 'temporary password' /var/log/mysqld.log
+```
+ 
+---
+ 
+## Important Notes
+ 
+- **Amazon Linux 2 vs 2023:** AL2023 uses `dnf` instead of `yum` and requires the EL9 RPM. AL2 would use the EL7 RPM.
+- **MariaDB alternative:** If you don't specifically need Oracle MySQL, Amazon Linux 2023 includes MariaDB (`sudo dnf install mariadb105-server`) which is fully compatible for most LAMP/LEMP stacks. 
+- **Security Group:** If connecting remotely, open TCP port 3306 in your EC2 security group.

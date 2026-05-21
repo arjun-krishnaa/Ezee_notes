@@ -1,0 +1,15 @@
+appuser ALL=(root) NOPASSWD: SERVICE_MGMT, READ_ONLY, NGINX_LOG_OPS
+
+appuser ALL=(ALL) NOPASSWD: ALL, \
+    !/bin/rm, \
+    !/bin/rmdir, \
+    !/bin/chmod, \
+    !/bin/chown, \
+    !/usr/bin/apt, \
+    !/usr/bin/yum, \
+    !/usr/bin/dnf, \
+    !/bin/vim, \
+    !/bin/nano, \
+    !/bin/sed, \
+    !/usr/bin/crontab
+

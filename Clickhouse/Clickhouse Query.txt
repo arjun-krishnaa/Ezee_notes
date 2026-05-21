@@ -1,0 +1,43 @@
+clickhouse client - to login 
+
+----------------------------------------------
+to see tables and size
+
+SELECT 
+    database,
+    table,
+    formatReadableSize(SUM(bytes)) AS total_size,
+    SUM(rows) AS total_rows
+FROM system.parts
+WHERE active = 1
+GROUP BY 
+    database, table
+ORDER BY 
+    SUM(bytes) DESC;
+
+---------------------------------------------
+to clear space delete log
+
+ TRUNCATE TABLE system.text_log;
+TRUNCATE TABLE system.trace_log;
+TRUNCATE TABLE system.part_log;
+TRUNCATE TABLE system.text_log;
+TRUNCATE TABLE system.background_schedule_pool_log;
+
+----------------------------------------------
+
+
+Password
+ 
+ezeebits
+ 
+Sudo su
+ 
+ssh bhais
+ 
+busiq
+
+mywork
+
+--------------------------------------
+ 

@@ -1,0 +1,45 @@
+APPLICATION SERVER:
+
+1. TOMCAT
+	4 services - [Default - 8080]
+2. NGINX - [80, 443]
+3. REDIS - [6379]
+4. DATABASE
+	CLICKHOUSE - [9000, 8123]
+	MYSQL - [3306]
+5. CRON
+
+WEB SERVER:
+
+1. PHP
+2. NGINX - [80, 443]
+3. REDIS - [6379]
+
+TROUBLESHOOTING  AND ERRORS:
+
+Initial stage- Tomcat
+1. Database connectivity - once done, it will never happen again
+
+In Running Stage
+
+If tomcat failed to start - 
+					need to check Catalina.out log
+					check LIB - library
+					check portnumber
+					check permission
+					check servicefile
+					check war file and path
+					db storage is full
+If nginx failed to start - 
+					need to checkpath
+					check portnumber
+					check permissions
+					check nginx syntax test
+					
+If redis server down - 
+					need to check port number - mostly doesn't failure
+If DB Stopped -
+					mostly memory full problem.
+					
+
+					

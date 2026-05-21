@@ -1,0 +1,23 @@
+SSL configuration
+-----------------------
+Each Machine having letsencrypt scripts in --/usr/letsencrypt   
+
+1. renewDnsDomain.sh ------> renew DNS for AWS R53
+2. addDnsDomain.sh   --------> add DNS for AWS R53
+3. addWebRootDomain.sh---> add SSL certificate via letsencrypt
+4. configureDomain.sh -------> add SSL certificate and add SSL config file (Jenkins)
+5. renewalWebroot.sh --------> renew SSL certificate via letsencrypt
+
+-------------------------------------------------------------------------------------------------------------------
+
+SSL configuration will be done via Jenkins also. Like it will create normal site, www site, m site through that and also create one conf file for SSL certificate.
+
+---------------------------------------------------------------------------------------------------------------
+
+letsencrypt SSL validity duration 3 months. Have renew SSL certificate three months once.
+
+-----------------------------------------------------------------------------------------------------------
+
+Its opensource and free.
+
+------------------------------------------------------------------------------------------

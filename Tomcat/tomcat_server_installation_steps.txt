@@ -1,0 +1,79 @@
+# tomcat
+ 
+#Add User
+
+sudo groupadd tomcat 
+
+sudo useradd -g tomcat -s /bin/bash -M -r -d /usr/tomcat tomcat 
+
+sudo chown -R tomcat.tomcat /usr/tomcat/
+ 
+#Download and install tomcat
+
+wget https://dlcdn.apache.org/tomcat/tomcat-11/v11.0.9/bin/apache-tomcat-11.0.9.tar.gz
+
+tar -xvf apache-tomcat-11.0.9.tar.gz
+
+sudo mv apache-tomcat-8.5.51 /usr/tomcat/
+
+sudo chown -R tomcat.tomcat
+ 
+# Install Tomcat Native
+
+dnf install tomcat-native
+ 
+#JDK 17
+
+wget https://corretto.aws/downloads/latest/amazon-corretto-17-x64-linux-jdk.rpm
+
+wget https://corretto.aws/downloads/latest/amazon-corretto-21-aarch64-linux-jdk.rpm
+ 
+rpm -Uivh amazon-corretto-17-x64-linux-jdk.rpm
+
+java -version
+ 
+alternatives --config java
+ 
+which java
+ 
+/usr/lib/jvm/java-17-amazon-corretto.x86_64/
+ 
+environment variables
+
+---------------------------
+
+vi /etc/environment
+
+export JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto.x86_64
+
+export JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto
+ 
+#systemd Service Configure
+
+/etc/systemd/system/r2bits-tomcat.service
+ 
+sudo systemctl daemon-reload
+
+sudo systemctl enable r3bits-tomcat
+
+sudo systemctl start r3bits-tomcat
+
+sudo systemctl status r3bits-tomcat
+
+ 
+
+
+mkdir /usr/run
+
+mkdir -p /data/war
+
+mkdir -p /data/log/tomcat/
+
+cd /usr/run
+
+vi tomout
+
+tail -f /usr/tomcat/tomcat-11.0.9/logs/catalina.out
+
+chmod +x tomout
+ 

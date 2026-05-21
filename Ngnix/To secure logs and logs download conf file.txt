@@ -1,0 +1,68 @@
+Install httpd passwd tool  ---> sudo yum install httpd-tools -y   
+
+Create password file and user---> sudo htpasswd -c /etc/nginx/.jenkins_logs_auth admin
+
+to change password ---> htpasswd /etc/nginx/.jenkins_logs_auth admin (like run again above command)
+
+Fix permissions ---> chmod -R o+rx /usr/tomcat/tomcat-2/logs
+				 chmod o+rx /usr
+				 chmod o+rx /usr/tomcat
+				 chmod o+rx /usr/tomcat/tomcat-2
+
+Fix Ownerships ---> sudo chown -R nginx:nginx /usr/tomcat/tomcat-2/logs
+
+
+
+chmod -R o+rx /var/log/nginx/
+  198  chown -R nginx:nginx /var/log/nginx
+  199  vi /etc/nginx/conf.d/default.conf
+  200  nginx -t
+  201  nginx -s
+  202  nginx -s reload
+  203  chmod -R o+rx /var/log/
+  204  chmod -R o+rx /var/
+  205  chown -R nginx:nginx /var/log/nginx/
+  206  chmod -R o+rx /var/log/nginx/*
+  207  chown -R nginx:nginx /var/log/nginx/*
+  208  nginx -s reload
+
+---------------------------------------------------------------------------------
+
+  location /logs/ {
+    alias /var/log/nginx;
+
+    autoindex on;
+    autoindex_exact_size off;
+    autoindex_localtime on;
+
+    default_type text/plain;
+
+    auth_basic "Restricted Log Access";
+    auth_basic_user_file /etc/nginx/.jenkins_logs_auth;
+
+    limit_except GET HEAD {
+        deny all;
+
+----------------------------------------------------------------------------------------
+
+location ~ ^/(console\.(out|err))$ {
+    alias /var/log/chatcore/$1;
+
+    default_type text/plain;
+
+    add_header Content-Disposition 'attachment; filename="$1"';
+
+    auth_basic "Restricted Log Access";
+    auth_basic_user_file /etc/nginx/.jenkins_logs_auth;
+}
+
+
+if we hit this links it will directly download live logs
+
+https://chatcore.ezeebits.in/console.out
+https://chatcore.ezeebits.in/console.err
+
+-----------------------------------------------------------------------------------
+
+
+

@@ -1,0 +1,49 @@
+server {
+    listen       80;
+    server_name  172.16.200.163;
+
+       location /busservices/api/2.0/json {
+        index index.html index.htm index.jsp;
+        deny    all;
+    }
+
+
+    location / {
+        index index.html index.htm index.jsp;
+        try_files $uri   @tomcat ;
+    }
+
+# Proxy pass to servlet container
+    location @tomcat {
+        proxy_redirect          off;
+        proxy_set_header        Host               $host;
+        proxy_set_header        X-Real-IP          $remote_addr;
+        proxy_set_header        X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto  http;
+        proxy_pass              http://localhost:8082;
+        proxy_buffer_size       8k;
+        proxy_buffers           16 32k;
+        proxy_intercept_errors on;
+        proxy_connect_timeout       600;
+        proxy_send_timeout          600;
+        proxy_read_timeout          600;
+        send_timeout                600;
+     }
+
+
+    location /probe/ {
+        proxy_redirect          off;
+        proxy_set_header        Host               $host;
+        proxy_set_header        X-Real-IP          $remote_addr;
+        proxy_set_header        X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto  http;
+        proxy_pass              http://localhost:8081;
+        proxy_buffer_size       8k;
+        proxy_buffers           16 32k;
+        proxy_intercept_errors on;
+        proxy_connect_timeout       600;
+        proxy_send_timeout          600;
+        proxy_read_timeout          600;
+        send_timeout                600;
+     }
+}

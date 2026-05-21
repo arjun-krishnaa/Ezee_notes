@@ -1,0 +1,11 @@
+1. update the server.
+2. Install java
+3. install jenkins
+4. aws configuration
+5. ssm agent anable
+6. attach iam role for ssm agent and jenkins deployment.
+7. install plugins in jenkins
+8. need proper demo git hub
+9. need teams for noyification send.
+10.install maven for war build.
+11.need another one sever for deploying.

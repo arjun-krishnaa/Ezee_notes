@@ -1,0 +1,84 @@
+Here is the **English version** of how to run `composer update` on your web server:
+
+---
+
+## 1️⃣ Login to Your Server (via SSH)
+
+```bash
+ssh username@your-server-ip
+```
+
+---
+
+## 2️⃣ Go to Your Project Directory
+
+Navigate to the folder where your project is located:
+
+```bash
+cd /var/www/html/your-project
+```
+
+(Replace the path with your actual project path.)
+
+---
+
+## 3️⃣ Check if Composer is Installed
+
+```bash
+composer -V
+```
+
+If Composer is not installed, install it:
+
+```bash
+curl -sS https://getcomposer.org/installer | php
+mv composer.phar /usr/local/bin/composer
+```
+
+---
+
+## 4️⃣ Run Composer Update
+
+```bash
+composer update
+```
+
+If you get a memory limit error:
+
+```bash
+php -d memory_limit=-1 /usr/local/bin/composer update
+```
+
+---
+
+## 5️⃣ Fix Permission Issues (if needed)
+
+```bash
+sudo chown -R www-data:www-data /var/www/html/your-project
+sudo chmod -R 775 storage bootstrap/cache
+```
+
+---
+
+## 6️⃣ If It’s a Laravel Project (Optional)
+
+If your project is a Laravel application:
+
+```bash
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
+```
+
+---
+
+## ⚠️ Important Note
+
+* It is **not recommended** to run `composer update` directly on a production server.
+* Instead, use:
+
+```bash
+composer install --no-dev --optimize-autoloader
+```
+
+If you tell me your server type (Ubuntu, CentOS, cPanel, etc.), I can give you more specific instructions.

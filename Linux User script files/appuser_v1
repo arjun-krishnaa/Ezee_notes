@@ -1,0 +1,41 @@
+Cmnd_Alias SERVICE_MGMT = \
+    /bin/systemctl start nginx, \
+    /bin/systemctl stop nginx, \
+    /bin/systemctl status nginx, \
+    /bin/systemctl restart nginx, \
+    /bin/systemctl start php-fpm, \
+    /bin/systemctl stop php-fpm, \
+    /bin/systemctl status php-fpm, \
+    /bin/systemctl restart php-fpm, \
+    /bin/systemctl start amazon-ssm-agent, \
+    /bin/systemctl stop amazon-ssm-agent, \
+    /bin/systemctl status amazon-ssm-agent, \
+    /bin/systemctl restart amazon-ssm-agent, \
+    /bin/systemctl start redis, \
+    /bin/systemctl stop redis, \
+    /bin/systemctl status redis, \
+    /bin/systemctl restart redis, \
+    /bin/systemctl start redis-server, \
+    /bin/systemctl stop redis-server, \
+    /bin/systemctl status redis-server, \
+    /bin/systemctl restart redis-server
+
+Cmnd_Alias READ_ONLY = \
+    /bin/df, \
+    /bin/free, \
+    /usr/bin/free, \
+    /bin/ps, \
+    /usr/bin/ps, \
+    /usr/bin/top, \
+    /bin/cat, \
+    /usr/bin/tail, \
+    /bin/ls, \
+    /bin/du
+
+Cmnd_Alias NGINX_LOG_OPS = \
+    /bin/cp /var/log/nginx/* /var/log/nginx/*, \
+    /bin/mv /var/log/nginx/* /var/log/nginx/*, \
+    /bin/ls /var/log/nginx, \
+    /bin/ls /var/log/nginx/*
+
+appuser ALL=(root) NOPASSWD: SERVICE_MGMT, READ_ONLY, NGINX_LOG_OPS

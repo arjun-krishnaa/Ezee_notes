@@ -1,0 +1,49 @@
+# php
+dnf install ncurses-compat-libs
+dnf  install  php php-cli php-common  php-fpm php-gd php-mbstring php-mysqlnd php-pdo php-pear ImageMagick 
+dnf install php-zip php-intl  php-redis
+ 
+ 
+systemctl disable httpd
+ 
+vi /etc/php-fpm.d/www.conf
+user = nginx
+group = nginx
+listen = /var/run/php-fpm/php-fpm.sock
+ 
+listen.acl_users = nginx
+ 
+mkdir /var/run/php-fpm/
+ 
+chown -R nginx.nginx /var/lib/php/session
+ 
+ 
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php -r "if (hash_file('sha384', 'composer-setup.php') === 'dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6') { echo 'Installer verified'.PHP_EOL; } else { echo 'Installer corrupt'.PHP_EOL; unlink('composer-setup.php'); exit(1); }"
+sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+php -r "unlink('composer-setup.php');"
+ 
+ 
+ln -s  /usr/local/bin/composer /usr/bin/composer
+ 
+php /usr/local/bin/composer install
+php composer install
+ 
+git fetch origin
+ 
+composer build-minify
+composer run-script build-minify --no-interaction --quiet
+ 
+ 
+export COMPOSER_ALLOW_SUPERUSER=1
+systemsystem
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+curl -sS https://getcomposer.org/installer -o composer-setup.php
+php -r "if (hash_file('sha384', 'composer-setup.php') === 'dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6') { echo 'Installer verified'.PHP_EOL; } else { echo 'Installer corrupt'.PHP_EOL; unlink('composer-setup.php'); exit(1); }"
+sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+php -r "unlink('composer-setup.php');"
+ 
+curl -sS https://getcomposer.org/installer -o composer-setup.php
+
+sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer

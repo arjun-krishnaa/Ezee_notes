@@ -1,0 +1,109 @@
+server {
+    listen       80;
+    server_name  dev-jenkins.ezeebits.in www.dev-jenkins.ezeebits.in m.dev-jenkins.ezeebits.in;
+    include /etc/nginx/global/letsencrypt-acme-challenge.conf;
+}
+
+server {
+  listen 443 ssl;
+  listen [::]:443 ssl;
+  server_name www.dev-jenkins.ezeebits.in dev-jenkins.ezeebits.in;
+
+  access_log  /var/log/nginx/portal.access.log  custom_log;
+
+  ssl_certificate /usr/letsencrypt/webroot/config/live/dev-jenkins.ezeebits.in-0002/fullchain.pem;
+  ssl_certificate_key /usr/letsencrypt/webroot/config/live/dev-jenkins.ezeebits.in-0002/privkey.pem;
+
+  ssl_session_cache shared:SSL:50m;
+  ssl_session_timeout 1d;
+  ssl_session_tickets off;
+
+  ssl_dhparam /etc/ssl/certs/dhparam.pem;
+
+  ssl_prefer_server_ciphers on;
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+  add_header 'Referrer-Policy' 'origin';
+
+  ssl_ciphers 'ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS';
+
+  add_header Strict-Transport-Security "max-age=31536000; includeSubdomains; preload";
+
+       location /busservices/api/2.0/json {
+        index index.html index.htm index.jsp;
+        deny    all;
+    }
+
+
+    location / {
+        index index.html index.htm index.jsp;
+        try_files $uri   @tomcat ;
+    }
+    location /mercservices {
+        index index.html index.htm index.jsp;
+        try_files $uri   @mercservices ;
+    }
+
+
+    location /logs/ {
+    alias /usr/tomcat/jenkins-tomcat-11/logs/;
+
+    autoindex on;
+    autoindex_exact_size off;
+    autoindex_localtime on;
+
+    auth_basic "Restricted Logs";
+    auth_basic_user_file /etc/nginx/.jenkins_logs_auth;
+
+    limit_except GET HEAD {
+        deny all;
+    }
+  }
+
+
+# Proxy pass to servlet container
+    location @tomcat {
+        proxy_redirect          off;
+        proxy_set_header        Host               $host;
+        proxy_set_header        X-Real-IP          $remote_addr;
+        proxy_set_header        X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto  http;
+        proxy_pass              http://localhost:9092;
+        proxy_buffer_size       8k;
+        proxy_buffers           16 32k;
+        proxy_intercept_errors on;
+        proxy_connect_timeout       600;
+        proxy_send_timeout          600;
+        proxy_read_timeout          600;
+        send_timeout                600;
+     }
+
+
+    location /probe/ {
+        proxy_redirect          off;
+        proxy_set_header        Host               $host;
+        proxy_set_header        X-Real-IP          $remote_addr;
+        proxy_set_header        X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto  http;
+        proxy_pass              http://localhost:9081;
+        proxy_buffer_size       8k;
+        proxy_buffers           16 32k;
+        proxy_intercept_errors on;
+        proxy_connect_timeout       600;
+        proxy_send_timeout          600;
+        proxy_read_timeout          600;
+        send_timeout                600;
+     }
+
+  include /etc/nginx/global/letsencrypt-acme-challenge.conf;
+  include /etc/nginx/global/restrictions.conf;
+}
+
+
+
+
+location / {
+        proxy_pass http://127.0.0.1:8082/;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }

@@ -1,0 +1,237 @@
+WITHOUT SSL CERTIFICATE
+
+server { ---------------------------------------------------------------------------------------------------------> server block (virtual host configuration)
+    listen      80 default_server;  --------------------------------------------------------------------------> Listens on port 80 (HTTP) & [default_server → this is the fallback server if no match is found]
+    server_name app.r3.ezeebits.com;  ----------------------------------------------------------------> Domain name this config responds to
+
+    root  /var/www/bits/root;   --------------------------------------------------------------------------> Default directory for serving static files
+    access_log  /var/log/nginx/app.access.log ;  ----------------------------------------------------> Logs all incoming requests for this server
+
+    location /busservices {   --------------------------------------------------------------------------------> Matches requests like - [http://app.r3.ezeebits.com/busservices]
+        proxy_redirect          off;  ----------------------------------------------------------------------------> Prevents NGINX from modifying redirects from backend
+        proxy_set_header        Host               $host;   -------------------------------------------------> Passes original host header to backend
+        proxy_set_header        X-Real-IP          $remote_addr;  ------------------------------------> Sends client real IP
+        proxy_set_header        X-Forwarded-For    $proxy_add_x_forwarded_for; ---------> Adds client IP chain (important for logging)
+        proxy_set_header        X-Forwarded-Proto  http; --------------------------------------------> Tells backend request came via HTTP
+        proxy_pass              http://localhost:8080; ----------------------------------------------------> Forwards request to: Tomcat / App running on port 8080 
+        proxy_buffer_size       8k;   --------------------------------------------------------------------------> Controls response buffering, Helps performance & large responses
+        proxy_buffers           16 32k; ------------------------------------------------------------------------> Controls response buffering, Helps performance & large responses
+        proxy_intercept_errors on;  -------------------------------------------------------------------------> NGINX handles errors instead of backend
+        proxy_connect_timeout       600; -------------------------------------------------------------------> Very high timeout (600 sec = 10 min) [Useful for: Long API calls, File uploads]
+        proxy_send_timeout          600;  -------------------------------------------------------------------> Very high timeout (600 sec = 10 min) [Useful for: Long API calls, File uploads]
+        proxy_read_timeout          600;   -------------------------------------------------------------------> Very high timeout (600 sec = 10 min) [Useful for: Long API calls, File uploads]
+        send_timeout                600;        -------------------------------------------------------------------> Very high timeout (600 sec = 10 min) [Useful for: Long API calls, File uploads]
+    }
+    location /probe {  --------------------------------------------------------------------------------------------> Endpoint usually used for: [Health checks, Internal monitoring]
+        proxy_redirect          off;
+        proxy_set_header        Host               $host;
+        proxy_set_header        X-Real-IP          $remote_addr;
+        proxy_set_header        X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto  http;
+        proxy_pass              http://localhost:8443;  ------------------------------------------------------> Sends request to backend on port 8443
+        proxy_buffer_size       8k;
+        proxy_buffers           16 32k;
+        proxy_intercept_errors on;
+        proxy_connect_timeout       600;
+        proxy_send_timeout          600;
+        proxy_read_timeout          600;
+        send_timeout                600;
+
+        allow 14.195.132.162;----------------------------------------------------------------------------------> Only this IP can access /probe and Everyone else →  blocked [Good for:Monitoring tools, Internal APIs]
+        deny all;                       ----------------------------------------------------------------------------------> Only this IP can access /probe and Everyone else →  blocked [Good for:Monitoring tools, Internal APIs]
+    }
+
+
+    location /logs {
+        root  /var/www/bits/root/logs;  ------------------------------------------------------------------> Serves static files from
+    }
+
+    client_max_body_size 1024k;   ----------------------------------------------------------------------------> Max upload size = 1 MB [If exceeded → 413 Request Entity Too Large]
+
+    include global/service.conf; ---------------------------------------------------------------------------------> contains [Common proxy settings, Headers / caching]
+    include global/blockAPIRequest.conf;--------------------------------------------------------------------> Blocks unwanted API requests, include [Rate limiting, IP blocking]
+    include global/restrictions.conf;  ---------------------------------------------------------------------------> Security rules [Deny access to sensitive paths, Block bad bots]
+    include global/letsencrypt-acme-challenge.conf; ----------------------------------------------------->  Used for Let’s Encrypt SSL verification [it allows /.well-known/acme-challenge/]
+}
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+server {-------------------------------------------------------------------------------------------------------------> virtual host configuration
+    listen       80; -------------------------------------------------------------------------------------------------> Server listen port 80
+    server_name  dev-stage.ezeecargo.in;  ---------------------------------------------------------------> Domain this server responds to
+    include /etc/nginx/global/letsencrypt-acme-challenge.conf;-----------------------------------> Used by Let’s Encrypt to verify domain ownership [Includes config for: /.well-known/acme-challenge/]
+}
+
+server {
+  listen 443 ssl;  ---------------------------------------------------------------------------------------------------> HTTPS port  enable TLS
+  listen [::]:443 ssl;   ---------------------------------------------------------------------------------------------> IPv6 support enable TLS
+  server_name dev-stage.ezeecargo.in;
+
+ error_log /var/log/nginx/error.log warn;  ----------------------------------------------------------------> Logs only warnings and errors
+  access_log /var/log/nginx/access.log custom_log; ----------------------------------------------------> Logs requests using custom_log format [Format defined elsewhere]
+  ssl_certificate /usr/letsencrypt/webroot/config/live/dev-stage.ezeecargo.in/fullchain.pem;--------------------------> Public certificate (full chain)
+  ssl_certificate_key /usr/letsencrypt/webroot/config/live/dev-stage.ezeecargo.in/privkey.pem; ---------------------> Private key
+
+  ssl_session_cache shared:SSL:50m;  -----------------------------------------------------------------------> Stores SSL sessions in memory
+  ssl_session_timeout 1d; ---------------------------------------------------------------------------------------> Session valid for 1 day
+  ssl_session_tickets off;-------------------------------------------------------------------------------------------> Disables session tickets (better security)
+
+  ssl_dhparam /etc/ssl/certs/dhparam.pem; --------------------------------------------------------------> Diffie-Hellman parameters → secure key exchange
+
+  ssl_prefer_server_ciphers on; --------------------------------------------------------------------------------> Server decides cipher priority
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2; ----------------------------------------------------------------------> Allowed TLS versions
+  add_header 'Referrer-Policy' 'origin'; -----------------------------------------------------------------------> Controls referrer info sent by browse
+
+  ssl_ciphers 'ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS';-----------------------------------------------------------> List of allowed encryption algorithms [!DSS → disables weak DSS ciphers]
+
+  add_header Strict-Transport-Security "max-age=31536000; includeSubdomains; preload";---------> Forces browser to always use HTTPS and Prevents SSL stripping attacks
+
+    #   location /busservices/api/2.0/json {
+    #    index index.html index.htm index.jsp;
+    #    deny    all;
+    #}
+
+
+    location / { ------------------------------------------------------------------------------------------------------------------> Matches all requests
+        index index.html index.htm index.jsp; --------------------------------------------------------------------------> Default files
+        try_files $uri   @tomcat ; -------------------------------------------------------------------------------------------> Logic [Try static file from disk AND If not found → go to @tomcat]
+    }
+    #location /mercservices {
+    #    index index.html index.htm index.jsp;
+    #    try_files $uri   @mercservices ;
+    #}
+
+
+    location /logs/ { ---------------------------------------------------------------------------------------------------------->  URL path to access logs
+    alias /usr/tomcat/cargo-stage-tomcat-11/logs/; --------------------------------------------------------------> Maps URL /logs/ → actual directory
+
+    autoindex on; -------------------------------------------------------------------------------------------------------------> Enables file listing in browser
+    autoindex_exact_size off; ----------------------------------------------------------------------------------------------> Shows human-readable sizes (KB/MB)
+    autoindex_localtime on; ------------------------------------------------------------------------------------------------> Shows local time instead of UTC
+
+    auth_basic "Restricted Logs";   ---------------------------------------------------------------------------------------> Enables login popup
+    auth_basic_user_file /etc/nginx/.jenkins_logs_auth; ----------------------------------------------------------> File containing username/password
+
+    limit_except GET HEAD {  ------------------------------------------------------------------------------------------------> Only allows: [GET, HEAD] 
+        deny all;   ------------------------------------------------------------------------------------------------------------------> Blocks [POST, PUT, DELETE] (Prevents misuse of logs endpoint)
+    }
+  }
+
+
+# Proxy pass to servlet container
+    location @tomcat { ------------------------------------------------------------------------------------------------------> Named location (internal use only)
+        proxy_redirect          off;
+        proxy_set_header        Host               $host;
+        proxy_set_header        X-Real-IP          $remote_addr;
+        proxy_set_header        X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto  http;
+        proxy_pass              http://localhost:6060;
+        proxy_buffer_size       8k;
+        proxy_buffers           16 32k;
+        proxy_intercept_errors on;   --------------------------------------------------------------------------------------> NGINX handles errors
+        proxy_connect_timeout       600;
+        proxy_send_timeout          600;
+        proxy_read_timeout          600;
+        send_timeout                600;
+     }
+
+
+    #location /probe/ {
+    #    proxy_redirect          off;
+    #    proxy_set_header        Host               $host;
+    #    proxy_set_header        X-Real-IP          $remote_addr;
+    #    proxy_set_header        X-Forwarded-For    $proxy_add_x_forwarded_for;
+    #    proxy_set_header        X-Forwarded-Proto  http;
+    #    proxy_pass              http://localhost:9081;
+    #    proxy_buffer_size       8k;
+    #    proxy_buffers           16 32k;
+    #    proxy_intercept_errors on;
+    #    proxy_connect_timeout       600;
+    #    proxy_send_timeout          600;
+    #    proxy_read_timeout          600;
+    #    send_timeout                600;
+    # }
+
+  include /etc/nginx/global/letsencrypt-acme-challenge.conf;  --------------------> SSL validation path
+  include /etc/nginx/global/restrictions.conf;  ------------------------------------------> contains [Security rules, Blocking patterns]
+}
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+WITH SSL CONFIGURATION
+
+server {
+  listen 443 ssl;  --------------------------------------------------------------------------------------------------> HTTPS port,  enables SSL/TLS
+  listen [::]:443 ssl; ---------------------------------------------------------------------------------------------->  enables IPv6 support, enables SSL/TLS
+  server_name app.r3.ezeebits.com;
+  root  /var/www/bits/root;
+
+  location /probe {
+      proxy_pass http://localhost:8081/probe;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      include global/ezeeinfo.conf;
+      deny    all;
+  }
+
+  # Root location: block direct access
+  location / {
+      return 403;  # or redirect to login page
+  }
+
+  location /busservice {
+      index index.html index.htm index.jsp;
+      try_files $uri   @tomcat ;
+  }
+
+  location /tripjob-web {
+      index index.html index.htm index.jsp;
+      try_files $uri   @tomcat ;
+      include global/ezeeinfo.conf;
+      deny    all;
+  }
+
+  location /manager {
+      try_files $uri   @tomcat ;
+      include global/ezeeinfo.conf;
+      deny    all;
+  }
+
+  location /host-manager {
+      try_files $uri   @tomcat ;
+      include global/ezeeinfo.conf;
+      deny    all;
+  }
+
+  access_log  /var/log/nginx/app.access.log;
+
+  ssl_certificate /usr/letsencrypt/dns/config/live/r3.ezeebits.com/fullchain.pem;
+  ssl_certificate_key /usr/letsencrypt/dns/config/live/r3.ezeebits.com/privkey.pem;
+
+  # http://vincent.bernat.im/en/blog/2011-ssl-session-reuse-rfc5077.html
+  ssl_session_cache shared:SSL:50m;
+  ssl_session_timeout 1d;
+  ssl_session_tickets off;
+
+  #ssl_dhparam /etc/nginx/ssl/dhparam.pem;
+  ssl_dhparam /etc/ssl/certs/dhparam.pem;
+
+  # http://blog.ivanristic.com/2013/09/is-beast-still-a-threat.html
+  ssl_prefer_server_ciphers on;
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+  add_header 'Referrer-Policy' 'origin';
+
+  # http://blog.ivanristic.com/2013/08/configuring-apache-nginx-and-openssl-for-forward-secrecy.html
+  ssl_ciphers 'ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS';
+
+  ssl_trusted_certificate /usr/letsencrypt/dns/config/live/r3.ezeebits.com/fullchain.pem;
+
+  # to avoid ssl stripping https://en.wikipedia.org/wiki/SSL_stripping#SSL_stripping
+  # also https://hstspreload.org/
+#  add_header Strict-Transport-Security "max-age=31536000; includeSubdomains; preload";
+
+    include global/service.conf;
+    include global/blockAPIRequest.conf;
+    include global/restrictions.conf;
+    include global/letsencrypt-acme-challenge.conf;
+}

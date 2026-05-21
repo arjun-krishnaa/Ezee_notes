@@ -1,0 +1,134 @@
+server {
+  listen 443 ssl;
+  listen [::]:443 ssl;
+  server_name app.r3.ezeebits.com;
+  root  /var/www/bits/root;
+
+  location /probe {
+      proxy_pass http://localhost:8081/probe;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      include global/ezeeinfo.conf;
+      deny    all;
+  }
+
+  # Root location: block direct access
+  location / {
+      return 403;  # or redirect to login page
+  }
+
+  location /busservice {
+      index index.html index.htm index.jsp;
+      try_files $uri   @tomcat ;
+  }
+
+  location /tripjob-web {
+      index index.html index.htm index.jsp;
+      try_files $uri   @tomcat ;
+      include global/ezeeinfo.conf;
+      deny    all;
+  }
+
+  location /manager {
+      try_files $uri   @tomcat ;
+      include global/ezeeinfo.conf;
+      deny    all;
+  }
+
+  location /host-manager {
+      try_files $uri   @tomcat ;
+      include global/ezeeinfo.conf;
+      deny    all;
+  }
+
+  access_log  /var/log/nginx/app.access.log;
+
+  ssl_certificate /usr/letsencrypt/dns/config/live/r3.ezeebits.com/fullchain.pem;
+  ssl_certificate_key /usr/letsencrypt/dns/config/live/r3.ezeebits.com/privkey.pem;
+
+  # http://vincent.bernat.im/en/blog/2011-ssl-session-reuse-rfc5077.html
+  ssl_session_cache shared:SSL:50m;
+  ssl_session_timeout 1d;
+  ssl_session_tickets off;
+
+  #ssl_dhparam /etc/nginx/ssl/dhparam.pem;
+  ssl_dhparam /etc/ssl/certs/dhparam.pem;
+
+  # http://blog.ivanristic.com/2013/09/is-beast-still-a-threat.html
+  ssl_prefer_server_ciphers on;
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+  add_header 'Referrer-Policy' 'origin';
+
+  # http://blog.ivanristic.com/2013/08/configuring-apache-nginx-and-openssl-for-forward-secrecy.html
+  ssl_ciphers 'ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS';
+
+  ssl_trusted_certificate /usr/letsencrypt/dns/config/live/r3.ezeebits.com/fullchain.pem;
+
+  # to avoid ssl stripping https://en.wikipedia.org/wiki/SSL_stripping#SSL_stripping
+  # also https://hstspreload.org/
+#  add_header Strict-Transport-Security "max-age=31536000; includeSubdomains; preload";
+
+    include global/service.conf;
+    include global/blockAPIRequest.conf;
+    include global/restrictions.conf;
+    include global/letsencrypt-acme-challenge.conf;
+}
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+WITHOUT SSL CERTIFICATE
+
+server {
+    listen      80 default_server;
+    server_name app.r3.ezeebits.com;
+
+    root  /var/www/bits/root;
+    access_log  /var/log/nginx/app.access.log ;
+
+    location /busservices {
+        proxy_redirect          off;
+        proxy_set_header        Host               $host;
+        proxy_set_header        X-Real-IP          $remote_addr;
+        proxy_set_header        X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto  http;
+        proxy_pass              http://localhost:8080;
+        proxy_buffer_size       8k;
+        proxy_buffers           16 32k;
+        proxy_intercept_errors on;
+        proxy_connect_timeout       600;
+        proxy_send_timeout          600;
+        proxy_read_timeout          600;
+        send_timeout                600;
+    }
+    location /probe {
+        proxy_redirect          off;
+        proxy_set_header        Host               $host;
+        proxy_set_header        X-Real-IP          $remote_addr;
+        proxy_set_header        X-Forwarded-For    $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto  http;
+        proxy_pass              http://localhost:8443;
+        proxy_buffer_size       8k;
+        proxy_buffers           16 32k;
+        proxy_intercept_errors on;
+        proxy_connect_timeout       600;
+        proxy_send_timeout          600;
+        proxy_read_timeout          600;
+        send_timeout                600;
+
+        allow 14.195.132.162;
+        deny all;
+    }
+
+
+    location /logs {
+        root  /var/www/bits/root/logs;
+    }
+
+    client_max_body_size 1024k;
+
+    include global/service.conf;
+    include global/blockAPIRequest.conf;
+    include global/restrictions.conf;
+    include global/letsencrypt-acme-challenge.conf;
+}

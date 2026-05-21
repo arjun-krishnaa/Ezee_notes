@@ -1,0 +1,262 @@
+pipeline {
+    agent any
+
+    environment {
+        AWS_REGION = 'ap-south-1'
+        S3_BUCKET  = 'ezin-jenkins-cicd'
+        S3_KEY     = 'ezeewallet/server/servers.json'
+        FILE_PATH  = "${WORKSPACE}/servers.json"
+        LOCAL_DIR  = "${WORKSPACE}/json-to-upload"
+        ROLE_ARN   = "arn:aws:iam::696349585876:role/ssm-jenkins-trust"
+    }
+
+    stages {
+        stage('Write JSON') {
+            steps {
+                script {
+                    def jsonContent = '''{
+  "staging": [
+    {
+      "name": "staging-app",
+      "instanceId": "i-0b0668daa5d6c9918",
+      "accountId": "696349585876",
+      "region": "ap-south-2",
+      "role": "ssm-jenkins-trust",
+      "newmanEnv": "srm-stage-environment.json",
+      "approver": "venkat-ezee"
+    },
+    {
+      "name": "Orbit-Service-V2-JDK-17",
+      "instanceId": "i-0c8611854ef5b5a9d",
+      "accountId": "259640624578",
+      "region": "ap-south-1",
+      "role": "DeployerJenkinsSSMExecutionRole",
+      "newmanEnv": "N/A"
+    },
+    {
+      "name": "STAGING-FLEET",
+      "instanceId": "i-08c76b2eac8eeaae8",
+      "accountId": "696349585876",
+      "region": "ap-south-2",
+      "role": "ssm-jenkins-trust",
+      "newmanEnv": "N/A"
+    },
+    {
+      "name": "STAGING-WEB",
+      "instanceId": "i-0c73637bc3642b810",
+      "accountId": "696349585876",
+      "region": "ap-south-2",
+      "role": "ssm-jenkins-trust",
+      "newmanEnv": "N/A"
+    },
+    {
+      "name": "STAGING-CHATCORE",
+      "instanceId": "i-04b91556640779c2e",
+      "accountId": "696349585876",
+      "region": "ap-south-1",
+      "role": "ssm-jenkins-trust",
+      "newmanEnv": "N/A"
+    }
+  ],
+
+  "production": [
+
+    {
+      "name": "R1-Bits-CMS-PHP-v2-New",
+      "instanceId": "i-01530adffc91cd9d1",
+      "accountId": "259640624578",
+      "region": "ap-south-1",
+      "role": "DeployerJenkinsSSMExecutionRole",
+      "newmanEnv": "NA"
+    },
+    {
+      "name": "R2-Bits-CMS-PHP-v2-New",
+      "instanceId": "i-0e3bd7c9ca9326425",
+      "accountId": "259640624578",
+      "region": "ap-south-1",
+      "role": "DeployerJenkinsSSMExecutionRole",
+      "script": "NA"
+    },
+	    {
+      "name": "R3-Bits-CMS-PHP-v2-New",
+      "instanceId": "i-0407a8149081a22e7",
+      "accountId": "259640624578",
+      "region": "ap-south-2",
+      "role": "DeployerJenkinsSSMExecutionRole",
+      "newmanEnv": "NA"
+    },
+	{
+      "name": "Cargo-C1-CMS-PHP-v2-New",
+      "instanceId": "i-09cd06b872111b593",
+      "accountId": "259640624578",
+      "region": "ap-south-1",
+      "role": "DeployerJenkinsSSMExecutionRole",
+      "newmanEnv": "NA"
+    },
+	{
+      "name": "SVRT-Bits-Web-V2-PHP-8.4",
+      "instanceId": "i-07428473aefe64836",
+      "accountId": "884415569389",
+      "region": "ap-south-1",
+      "role": "DeployerJenkinsSSMExecutionRole",
+      "newmanEnv": "NA"
+    },
+	{
+      "name": "Bits-Gotour-Web-PHP-8.4",
+      "instanceId": "i-07428473aefe64836",
+      "accountId": "884415569389",
+      "region": "ap-south-1",
+      "role": "DeployerJenkinsSSMExecutionRole",
+      "newmanEnv": "NA"
+    },
+	{
+      "name": "Vinayaga-Bits-Web-V2",
+      "instanceId": "i-0d27779160adf1757",
+      "accountId": "259640624578",
+      "region": "ap-south-2",
+      "role": "DeployerJenkinsSSMExecutionRole",
+      "newmanEnv": "NA"
+    },
+    {
+      "name": "SBLT-Bits-Dashboard-8.4",
+      "instanceId": "i-0f8bca5f364df025f",
+      "accountId": "995202495874",
+      "region": "ap-south-1",
+      "role": "jenkins-cicd-role",
+      "script": "NA"
+    },
+    {
+      "name": "YBM-Bits-Web-PHP-8.4",
+      "instanceId": "i-074cff8c6ff2ce7c1",
+      "accountId": "995202495874",
+      "region": "ap-south-1",
+      "role": "jenkins-cicd-role",
+      "script": "NA"
+    },
+    {
+      "name": "VKV-Bits-Dashboard",
+      "instanceId": "i-05aeef13a3a27b677",
+      "accountId": "869935071997",
+      "region": "ap-south-2",
+      "role": "DeployerJenkinsSSMExecutionRole",
+      "script": "NA"
+    },
+    {
+      "name": "PRM-Bits-Dashboard",
+      "instanceId": "i-0a61c2be58fc7b395",
+      "accountId": "617676828320",
+      "region": "ap-south-2",
+      "role": "DeployerJenkinsSSMExecutionRole",
+      "script": "NA"
+    }
+  ],
+
+  "production-app": [
+
+    {
+      "name": "R1-Bits-Service-V2-JDK-17",
+      "instanceId": "i-0a757d59c1933fb0b",
+      "accountId": "259640624578",
+      "region": "ap-south-1",
+      "role": "DeployerJenkinsSSMExecutionRole",
+      "newmanEnv": "app-ezeebits-env-collection.json"
+    },
+    {
+      "name": "R2-Bits-Service-V2-JDK-17",
+      "instanceId": "i-06df5e47131394b48",
+      "accountId": "259640624578",
+      "region": "ap-south-1",
+      "role": "DeployerJenkinsSSMExecutionRole",
+      "newmanEnv": "r2-ezeebits-env-collection.json"
+    },
+    {
+      "name": "R3-BITS-SERVICE-V2-JDK-17",
+      "instanceId": "i-060a934d0ca946f33",
+      "accountId": "259640624578",
+      "region": "ap-south-2",
+      "role": "DeployerJenkinsSSMExecutionRole",
+      "newmanEnv": "r3-ezeebits-env-collection.json"
+    },
+	{
+      "name": "SBLT-Bits-Service-V2-JDK-17",
+      "instanceId": "i-079441563025cc052",
+      "accountId": "995202495874",
+      "region": "ap-south-1",
+      "role": "DeployerJenkinsSSMExecutionRole",
+      "newmanEnv": "N/A"
+    },
+	{
+      "name": "Vinayaga-Bits-Service-JDK-17",
+      "instanceId": "i-0463870c476b21bd1",
+      "accountId": "259640624578",
+      "region": "ap-south-2",
+      "role": "DeployerJenkinsSSMExecutionRole",
+      "newmanEnv": "N/A"
+    },
+	{
+      "name": "YBM-Bits-Service-V2-JDK-17",
+      "instanceId": "i-089f12ab06e79e2c8",
+      "accountId": "525550507683",
+      "region": "ap-south-2",
+      "role": "DeployerJenkinsSSMExecutionRole",
+      "newmanEnv": "N/A"
+    },
+	{
+      "name": "Gotour-Bits-Service-V2-JDK-17",
+      "instanceId": "i-0edcf93280e8d3669",
+      "accountId": "550718135217",
+      "region": "ap-south-1",
+      "role": "DeployerJenkinsSSMExecutionRole",
+      "newmanEnv": "N/A"
+    },
+	{
+      "name": "SVRT-Bits-Service-V2-JDK-17",
+      "instanceId": "i-02abd03af8b2b9155",
+      "accountId": "884415569389",
+      "region": "ap-south-1",
+      "role": "DeployerJenkinsSSMExecutionRole",
+      "newmanEnv": "N/A"
+    }
+  ]
+}'''
+                    writeFile file: env.FILE_PATH, text: jsonContent
+                }
+            }
+        }
+
+        stage('Prepare JSON for Upload') {
+            steps {
+                script {
+                    sh "mkdir -p '${env.LOCAL_DIR}'"
+                    sh "cp '${env.FILE_PATH}' '${env.LOCAL_DIR}/servers.json'"
+                    echo "📄 Copied JSON to ${env.LOCAL_DIR}/servers.json"
+                }
+            }
+        }
+
+        stage('Upload to S3') {
+            steps {
+                script {
+                    def versionKey = "ezeebits/server/versions/servers-${env.BUILD_ID}.json"
+
+                    sh """
+                        aws s3 cp '${env.LOCAL_DIR}/servers.json' 's3://${env.S3_BUCKET}/${env.S3_KEY}'
+                        aws s3 cp '${env.LOCAL_DIR}/servers.json' 's3://${env.S3_BUCKET}/${versionKey}'
+                    """
+
+                    echo "✅ Uploaded to: s3://${env.S3_BUCKET}/${env.S3_KEY}"
+                    echo "🕒 Versioned copy: s3://${env.S3_BUCKET}/${versionKey}"
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Pipeline completed successfully."
+        }
+        failure {
+            echo "❌ Pipeline failed."
+        }
+    }
+}
