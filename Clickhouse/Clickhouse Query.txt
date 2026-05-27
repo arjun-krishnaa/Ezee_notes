@@ -3,17 +3,17 @@ clickhouse client - to login
 ----------------------------------------------
 to see tables and size
 
-SELECT 
-    database,
-    table,
-    formatReadableSize(SUM(bytes)) AS total_size,
-    SUM(rows) AS total_rows
-FROM system.parts
-WHERE active = 1
-GROUP BY 
-    database, table
-ORDER BY 
-    SUM(bytes) DESC;
+    SELECT 
+        database,
+        table,
+        formatReadableSize(SUM(bytes)) AS total_size,
+        SUM(rows) AS total_rows
+    FROM system.parts
+    WHERE active = 1
+    GROUP BY 
+        database, table
+    ORDER BY 
+        SUM(bytes) DESC;
 
 ---------------------------------------------
 to clear space delete log

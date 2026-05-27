@@ -1,0 +1,8 @@
+to store git hub token permanently - git global config, use these commands
+
+git config credential.helper store
+git push http://example.com/repo.git
+Username: <type your username>
+Password: <type your password>
+
+-------------------------------------------------------------
